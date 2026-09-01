@@ -23,12 +23,12 @@
       markerLabel(cluster, label, cluster.x + 20, cluster.y + 4, step) + '</g>';
   }
   function singleMarkup(point) {
-    return '<g class="map-marker-g" data-slug="' + escapeAttr(point.slug) + '" data-step="' + point.step +
+    return '<a class="map-marker-g" href="#/' + escapeAttr(point.slug) + '" data-slug="' + escapeAttr(point.slug) + '" data-step="' + point.step +
       '" role="link" tabindex="0" aria-label="' + escapeAttr(point.name) + '">' +
       '<circle class="map-marker ' + confessionClass(point.confession) + '" cx="' + point.x.toFixed(1) +
       '" cy="' + point.y.toFixed(1) + '" r="13"/>' +
       '<text class="map-marker-num" x="' + point.x.toFixed(1) + '" y="' + point.y.toFixed(1) + '">' + point.step + '</text>' +
-      markerLabel(point, point.shortName, point.x + 18, point.y + 4, point.step) + '</g>';
+      markerLabel(point, point.shortName, point.x + 18, point.y + 4, point.step) + '</a>';
   }
 
   function renderSvg(data) {

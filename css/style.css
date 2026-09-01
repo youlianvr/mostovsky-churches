@@ -331,7 +331,6 @@ a:hover { color: var(--color-ochre-deep); }
   border-radius: var(--radius);
   padding: var(--space-sm);
 }
-.map-schema svg { display: block; width: 100%; height: auto; }
 
 .legend {
   display: flex;
@@ -359,7 +358,10 @@ a:hover { color: var(--color-ochre-deep); }
   min-width: 720px;              /* фикс. ширина в логических единицах схемы */
   width: 100%;
   height: auto;
+  pointer-events: none;
 }
+.map-schema svg .map-marker-g,
+.map-schema svg .map-cluster { pointer-events: all; }
 
 .map-background {
   pointer-events: none;
