@@ -34,7 +34,8 @@
   function renderSvg(data) {
     var riverMid = G.pointString(G.RIVER[Math.floor(G.RIVER.length / 2)][1], G.RIVER[Math.floor(G.RIVER.length / 2)][0]).split(",");
     return '<svg viewBox="0 0 ' + G.W + ' ' + G.H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Схема маршрута по храмам Мостовского района">' +
-      '<path class="map-district" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
+      '<g class="map-background" aria-hidden="true" pointer-events="none">' +
+      '<path class="map-district" pointer-events="none" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
       G.FORESTS.map(function (forest) {
         var center = G.project(forest[1], forest[0]);
         return '<ellipse class="map-forest" cx="' + center.x.toFixed(1) + '" cy="' + center.y.toFixed(1) + '" rx="' + forest[2] + '" ry="' + forest[3] + '"/>';
@@ -42,6 +43,7 @@
       '<path class="map-river" d="' + G.pathString(G.RIVER, false) + '"/>' +
       '<text class="map-water-label" x="' + riverMid[0] + '" y="' + (parseFloat(riverMid[1]) - 8) + '">р. Неман</text>' +
       G.ROADS.map(function (road) { return '<path class="map-road" d="' + G.pathString(road, false) + '"/>'; }).join("") +
+      '</g>' +
       '<polyline class="map-route-line" points="' + data.points.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ") + '"/>' +
       data.clusters.map(clusterMarkup).join("") + data.singles.map(singleMarkup).join("") + '</svg>';
   }

@@ -361,6 +361,10 @@ a:hover { color: var(--color-ochre-deep); }
   height: auto;
 }
 
+.map-background {
+  pointer-events: none;
+}
+
 .map-district {
   fill: #efe4ca;
   stroke: var(--color-ochre);
