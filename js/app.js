@@ -73,6 +73,7 @@
   }
 
   function renderHome() {
+    var schemaEl;
     var items = ROUTE.map(function (slug, i) {
       var c = findChurchBySlug(slug);
       return "<li>" +
@@ -92,7 +93,6 @@
         "храма 1740 года до новейшей церкви 2022 года.</p>" +
       "</section>" +
       "<section class=\"map-schema\" aria-label=\"Схема маршрута\">" +
-        "<p class=\"map-placeholder-note\">Схематическая карта района появится на этапе 5.</p>" +
         "<div class=\"legend\">" +
           "<span class=\"legend-item\"><span class=\"marker-sample orthodox\"></span> православный храм</span>" +
           "<span class=\"legend-item\"><span class=\"marker-sample\"></span> католический костёл</span>" +
@@ -102,6 +102,13 @@
         "<h2>Остановки маршрута</h2>" +
         "<ol class=\"route-list\">" + items + "</ol>" +
       "</section>";
+
+    schemaEl = document.querySelector(".map-schema");
+    if (schemaEl && window.ChurchMap) {
+      ChurchMap.renderSchema(schemaEl);
+    } else if (schemaEl) {
+      schemaEl.innerHTML = "<p class=\"map-placeholder-note\">Карта недоступна.</p>";
+    }
   }
 
   function photoHtml(church) {
