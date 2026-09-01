@@ -18,6 +18,7 @@ CHURCHES.forEach(function (church) {
   check(Array.isArray(church.history) && church.history.length >= 2 && church.history.every(text), prefix + "history must contain at least two paragraphs");
   check(Array.isArray(church.facts) && church.facts.length >= 3 && church.facts.every(text), prefix + "facts list incomplete");
   check(Array.isArray(church.sources) && church.sources.length > 0 && church.sources.every(text), prefix + "sources incomplete");
+  if (church.photo) { check(/^img\/photos\/[^/]+\.(jpg|jpeg|png|webp)$/i.test(church.photo), prefix + "photo path must be local and safe"); }
   if (church.placeholder) {
     check(!church.photo && !church.photoCredit, prefix + "placeholder must not claim a photo");
     check(church.facts.some(function (fact) { return /фото/i.test(fact); }), prefix + "placeholder needs justification");
