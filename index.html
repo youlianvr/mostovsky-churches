@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Храмы Мостовского района</title>
+  <meta name="description" content="Маршрут по 19 храмам Мостовского района Гродненской области: православные церкви и католические костёлы, их история и факты.">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <!-- СКЕЛЕТ (этап 0): контент заполняется на этапах 4–6 -->
   <header class="site-header">
-    <nav class="navbar">
+    <nav class="navbar" aria-label="Основная навигация">
       <a class="navbar-brand" href="#/">Храмы Мостовского района</a>
       <ul class="navbar-links">
         <li><a href="#/">Главная</a></li>
@@ -19,13 +19,19 @@
     </nav>
   </header>
 
-  <main id="app">
+  <main id="app" class="container">
     <p>Загрузка…</p>
   </main>
 
   <footer class="site-footer">
-    <p>© 2026 · Школьный проект «Храмы Мостовского района»</p>
+    <div class="container">
+      <p>© 2026 · Школьный проект по истории «Храмы Мостовского района»</p>
+      <p>Источники: planetabelarus.by, orthos.org (Гродненская епархия), sobory.ru, Википедия, Wikimedia Commons.</p>
+      <p><a href="https://github.com/youlianvr/mostovsky-churches" target="_blank" rel="noopener">Репозиторий проекта на GitHub</a></p>
+    </div>
   </footer>
+
+  <noscript><p class="container">Для просмотра маршрута включите JavaScript.</p></noscript>
 
   <script src="js/data.js"></script>
   <script src="js/map.js"></script>

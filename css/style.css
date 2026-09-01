@@ -253,6 +253,77 @@ a:hover { color: var(--color-ochre-deep); }
 }
 .crumbs a { color: var(--color-muted); }
 
+/* ---------- Главная: hero и список маршрута ---------- */
+.hero {
+  padding: var(--space-lg) 0 var(--space-md);
+}
+.hero p { max-width: 60ch; }
+
+.map-placeholder-note {
+  text-align: center;
+  color: var(--color-muted);
+  font-style: italic;
+  padding: var(--space-md);
+  margin: 0;
+}
+
+.route-name {
+  font-family: var(--font-serif);
+  font-weight: bold;
+  color: var(--color-green-deep);
+  text-decoration: none;
+  flex: 1 1 240px;
+}
+.route-name:hover { color: var(--color-ochre-deep); }
+
+.route-settlement {
+  color: var(--color-muted);
+  font-size: var(--fs-small);
+}
+
+/* ---------- Страница храма ---------- */
+.church-head h1 { margin-bottom: var(--space-xs); }
+
+.church-subtitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-muted);
+  margin-bottom: var(--space-md);
+}
+
+.fact-panel {
+  margin: var(--space-md) 0;
+}
+
+.note-inline {
+  color: var(--color-ochre-deep);
+  font-size: var(--fs-small);
+  margin-top: var(--space-xs);
+}
+
+.coords-note {
+  color: var(--color-ochre-deep);
+  font-size: var(--fs-small);
+  margin: var(--space-xs) 0 0;
+}
+
+.map-buttons {
+  margin: var(--space-md) 0 0;
+}
+.map-buttons .btn { margin-right: var(--space-sm); }
+
+.facts-list li { margin-bottom: var(--space-xs); }
+
+.route-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  border-top: 1px solid var(--color-line);
+  padding-top: var(--space-md);
+}
+
 /* ---------- Схема (этап 5) ---------- */
 .map-schema {
   background: var(--color-card);
