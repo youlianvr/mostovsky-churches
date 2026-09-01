@@ -1,3 +1,6 @@
 # Проект — только исходники
 Thumbs.db
 .DS_Store
+
+# временные файлы research
+.research/

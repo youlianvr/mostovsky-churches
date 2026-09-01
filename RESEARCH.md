@@ -2,6 +2,7 @@
 
 Проект: сайт-маршрут по храмам Мостовского района (Гродненская область, Беларусь).
 Этап 1 (research) — ЗАВЕРШЁН 2026-09-01.
+Этап 2 (фото) — ЗАВЕРШЁН 2026-09-01.
 Статусы: researched / confirmed / hypotheses / decisions / implemented / verified.
 Легенда координат: **confirmed** = точная точка храма из источника; **approx** = точка
 центра НП (fallback DG5, пометка «уточнить»).
@@ -15,34 +16,88 @@
 | **Костёл Божьей Матери в г. Мосты** | 53.4187, 24.5404 | 1992–2000 | planetabelarus.by (kostel-bozhey-materi-v-mostakh) |
 | **Костёл Посещения Девой Марией Елизаветы, д. Микелевщина** | 53.4885, 24.6808 | 1820-е | planetabelarus.by (kostel-poseshcheniya-...-v-mikelevshchine) |
 
-## Сводка по 19 объектам (координаты + контент)
+## Сводка по 19 объектам (координаты + контент + фото)
 
 | # | Slug | Объект | Координаты | Статус коорд. | История | Фото |
 |---|------|--------|-----------|--------------|---------|------|
-| 1 | mosty-vseh-skorbyashchih | г. Мосты — иконы БМ «Всех скорбящих Радость» (1994–95) | 53.4232, 24.5383 | **confirmed** | **researched** | gap |
-| 2 | mosty-bozhey-materi | г. Мосты — костёл Божьей Матери (1992–2000) | 53.4187, 24.5404 | **confirmed** | **researched** | gap |
-| 3 | mosty-iliinskiy | г. Мосты — пророка Илии (1910, дер.) | 53.4384, 24.5470 | **confirmed** | **researched** | gap |
-| 4 | mosty-sofii-sluckoy | г. Мосты — Софии Слуцкой (стр. с 2015) | 53.3918, 24.5368 | **confirmed** | **researched** | gap |
-| 5 | pacevichi-rozhdestva | д. Пацевичи — Рождества Пресв. Богородицы (1867) | 53.3233, 24.6928 | **confirmed** (епархия, DMS) | **researched** | gap |
-| 6 | samuilovichi-nikolaya | д. Самуйловичи — Николая Чудотворца (1801) | 53.3121, 24.6956 | approx (центр НП) | **researched** | gap |
-| 7 | lunno-predtechi | д. Лунно — Рождества Иоанна Предтечи (1889) | 53.4539, 24.2601 | **confirmed** | **researched** | gap |
-| 8 | gudevichi-rozhdestva | д. Гудевичи — Рождества Пресв. Богородицы (1852) | 53.3681, 24.1701 | **confirmed** | **researched** | gap |
-| 9 | belavichi-pokrova | д. Белавичи — Покрова Пресв. Богородицы (1822) | 53.3274, 24.5434 | **confirmed** | **researched** | gap |
-| 10 | kurilovichi-troitsy | д. Куриловичи — Св. Живоначальной Троицы (2022) | 53.3542, 24.8768 | approx (центр НП) | **researched** | gap |
-| 11 | cherlena-rozhdestva | д. Черлёна — Рождества Пресв. Богородицы (1871) | 53.4996, 24.2846 | approx (центр НП) | **researched** | gap |
-| 12 | peski-nikolaya | д. Пески — Николая Чудотворца (1870) | 53.3549, 24.6267 (ул. 50 лет БССР, 40) | approx (адрес из 2GIS) | **researched** | gap |
-| 13 | dubno-nikolaya | д. Дубно — Николая Чудотворца (1844) | 53.4447, 24.3706 | **confirmed** | **researched** | gap |
-| 14 | lunno-sv-anna | аг. Лунно — костёл Св. Анны (1782) | 53.4554, 24.2617 | **confirmed** | **researched** | gap |
-| 15 | mosty-pravye-ioanna | Мосты Правые — костёл Иоанна Крестителя (1992) | 53.4304, 24.6350 | **confirmed** | **researched** | gap |
-| 16 | peski-ruzhentsovoy | аг. Пески — костёл Богоматери Руженцовой (1918) | 53.3558, 24.6236 | **confirmed** | **researched** | gap |
-| 17 | bolshaya-rogoznitsa-marii | аг. Б. Рогозница — костёл Девы Марии (1926) | 53.2748, 24.6829 | **confirmed** | **researched** | gap |
-| 18 | strubnitsa-troitsky | д. Струбница (Плябановцы) — Свято-Троицкий костёл (1740) | 53.3275, 24.5915 | **confirmed** | **researched** | gap |
-| 19 | mikelevshchina-poseshcheniya | д. Микелевщина — костёл Посещения Девы Марии (1820-е) | 53.4885, 24.6808 | **confirmed** | **researched** | gap |
+| 1 | mosty-vseh-skorbyashchih | г. Мосты — иконы БМ «Всех скорбящих Радость» (1994–95) | 53.4232, 24.5383 | **confirmed** | **researched** | ✅ (эт.2) |
+| 2 | mosty-bozhey-materi | г. Мосты — костёл Божьей Матери (1992–2000) | 53.4187, 24.5404 | **confirmed** | **researched** | ✅ (эт.2) |
+| 3 | mosty-iliinskiy | г. Мосты — пророка Илии (1910, дер.) | 53.4384, 24.5470 | **confirmed** | **researched** | placeholder |
+| 4 | mosty-sofii-sluckoy | г. Мосты — Софии Слуцкой (стр. с 2015) | 53.3918, 24.5368 | **confirmed** | **researched** | placeholder |
+| 5 | pacevichi-rozhdestva | д. Пацевичи — Рождества Пресв. Богородицы (1867) | 53.3233, 24.6928 | **confirmed** (епархия, DMS) | **researched** | ✅ (эт.2) |
+| 6 | samuilovichi-nikolaya | д. Самуйловичи — Николая Чудотворца (1801) | 53.3121, 24.6956 | approx (центр НП) | **researched** | ✅ (эт.2) |
+| 7 | lunno-predtechi | д. Лунно — Рождества Иоанна Предтечи (1889) | 53.4539, 24.2601 | **confirmed** | **researched** | ✅ (эт.2) |
+| 8 | gudevichi-rozhdestva | д. Гудевичи — Рождества Пресв. Богородицы (1852) | 53.3681, 24.1701 | **confirmed** | **researched** | ✅ (эт.2) |
+| 9 | belavichi-pokrova | д. Белавичи — Покрова Пресв. Богородицы (1822) | 53.3274, 24.5434 | **confirmed** | **researched** | ✅ (эт.2) ⚠ |
+| 10 | kurilovichi-troitsy | д. Куриловичи — Св. Живоначальной Троицы (2022) | 53.3542, 24.8768 | approx (центр НП) | **researched** | placeholder |
+| 11 | cherlena-rozhdestva | д. Черлёна — Рождества Пресв. Богородицы (1871) | 53.4996, 24.2846 | approx (центр НП) | **researched** | placeholder |
+| 12 | peski-nikolaya | д. Пески — Николая Чудотворца (1870) | 53.3549, 24.6267 (ул. 50 лет БССР, 40) | approx (адрес из 2GIS) | **researched** | ✅ (эт.2) |
+| 13 | dubno-nikolaya | д. Дубно — Николая Чудотворца (1844) | 53.4447, 24.3706 | **confirmed** | **researched** | ✅ (эт.2) ⚠ |
+| 14 | lunno-sv-anna | аг. Лунно — костёл Св. Анны (1782) | 53.4554, 24.2617 | **confirmed** | **researched** | ✅ (эт.2) |
+| 15 | mosty-pravye-ioanna | Мосты Правые — костёл Иоанна Крестителя (1992) | 53.4304, 24.6350 | **confirmed** | **researched** | ✅ (эт.2) |
+| 16 | peski-ruzhentsovoy | аг. Пески — костёл Богоматери Руженцовой (1918) | 53.3558, 24.6236 | **confirmed** | **researched** | ✅ (эт.2) |
+| 17 | bolshaya-rogoznitsa-marii | аг. Б. Рогозница — костёл Девы Марии (1926) | 53.2748, 24.6829 | **confirmed** | **researched** | ✅ (эт.2) |
+| 18 | strubnitsa-troitsky | д. Струбница (Плябановцы) — Свято-Троицкий костёл (1740) | 53.3275, 24.5915 | **confirmed** | **researched** | ✅ (эт.2) |
+| 19 | mikelevshchina-poseshcheniya | д. Микелевщина — костёл Посещения Девы Марии (1820-е) | 53.4885, 24.6808 | **confirmed** | **researched** | ✅ (эт.2) |
 
 **Итог координат: confirmed 15/19, approx 4/19 (DG5-fallback: Самуйловичи, Куриловичи,
 Черлёна, Пески-правосл.) — все с пометкой «уточнить».**
 **Итог истории: researched 19/19** (полный контент собран, см. ниже; у части объектов
 контент из сводной статьи района planetabelarus, у остальных — из отдельных страниц).
+**Итог фото: 15/19 с атрибуцией, 4/19 placeholder (см. раздел «Фото (этап 2)»).**
+
+## ✅ Фото (этап 2, 2026-09-01) — 15 файлов в img/photos/, все с атрибуцией
+
+Все фото — с Wikimedia Commons, лицензии CC BY / CC BY-SA (атрибуция обязательна).
+Каждое фото сверено с источником по md5 (см. .research/verify.py). Файлы — локальные
+копии в `img/photos/<slug>.jpg`, на сайте выводится блок `photoCredit`
+(автор + лицензия + ссылка на файл на Commons).
+
+| # | Локальный файл | Файл на Commons | Автор | Лицензия |
+|---|----------------|-----------------|-------|----------|
+| 1 | mosty-vseh-skorbyashchih.jpg | [Масты. Царква.jpg](https://commons.wikimedia.org/wiki/File:%D0%9C%D0%B0%D1%81%D1%82%D1%8B._%D0%A6%D0%B0%D1%80%D0%BA%D0%B2%D0%B0.jpg) | Валацуга (fgb.by) | CC BY-SA 3.0 |
+| 2 | mosty-bozhey-materi.jpg | [Масты. Касцёл.jpg](https://commons.wikimedia.org/wiki/File:%D0%9C%D0%B0%D1%81%D1%82%D1%8B._%D0%9A%D0%B0%D1%81%D1%86%D1%91%D0%BB.jpg) | Валацуга (fgb.by) | CC BY-SA 3.0 |
+| 5 | pacevichi-rozhdestva.jpg | [005a 306 Пацевичи, церковь, 21-05-2004.jpg](https://commons.wikimedia.org/wiki/File:005a_306_%D0%9F%D0%B0%D1%86%D0%B5%D0%B2%D0%B8%D1%87%D0%B8,_%D1%86%D0%B5%D1%80%D0%BA%D0%BE%D0%B2%D1%8C,_21-05-2004.jpg) | Globustut (globus.tut.by) | CC BY 4.0 |
+| 6 | samuilovichi-nikolaya.jpg | [Самуйлавічы Дольныя. Царква Святога Мікалая (01).jpg](https://commons.wikimedia.org/wiki/File:%D0%A1%D0%B0%D0%BC%D1%83%D0%B9%D0%BB%D0%B0%D0%B2%D1%96%D1%87%D1%8B_%D0%94%D0%BE%D0%BB%D1%8C%D0%BD%D1%8B%D1%8F._%D0%A6%D0%B0%D1%80%D0%BA%D0%B2%D0%B0_%D0%A1%D0%B2%D1%8F%D1%82%D0%BE%D0%B3%D0%B0_%D0%9C%D1%96%D0%BA%D0%B0%D0%BB%D0%B0%D1%8F_(01).jpg) | Валацуга (fgb.by) | CC BY-SA 3.0 |
+| 7 | lunno-predtechi.jpg | [Лунна. Царква.jpg](https://commons.wikimedia.org/wiki/File:%D0%9B%D1%83%D0%BD%D0%BD%D0%B0._%D0%A6%D0%B0%D1%80%D0%BA%D0%B2%D0%B0.jpg) | В.Васіленка (fgb.by) | CC BY-SA 3.0 |
+| 8 | gudevichi-rozhdestva.jpg | [Гудзевічы. Свята-Раства-Багародзіцкая царква.jpg](https://commons.wikimedia.org/wiki/File:%D0%93%D1%83%D0%B4%D0%B7%D0%B5%D0%B2%D1%96%D1%87%D1%8B._%D0%A1%D0%B2%D1%8F%D1%82%D0%B0-%D0%A0%D0%B0%D1%81%D1%82%D0%B2%D0%B0-%D0%91%D0%B0%D0%B3%D0%B0%D1%80%D0%BE%D0%B4%D0%B7%D1%96%D1%86%D0%BA%D0%B0%D1%8F_%D1%86%D0%B0%D1%80%D0%BA%D0%B2%D0%B0.jpg) | Сяргей Яраховіч (Валацуга) | CC BY-SA 3.0 |
+| 9 | belavichi-pokrova.jpg | [Бялавічы. Свята-Ільінская царква.jpg](https://commons.wikimedia.org/wiki/File:%D0%91%D1%8F%D0%BB%D0%B0%D0%B2%D1%96%D1%87%D1%8B._%D0%A1%D0%B2%D1%8F%D1%82%D0%B0-%D0%86%D0%BB%D1%8C%D1%96%D0%BD%D1%81%D0%BA%D0%B0%D1%8F_%D1%86%D0%B0%D1%80%D0%BA%D0%B2%D0%B0.jpg) | Стэльмах Аляксандр Мікалаевіч | CC BY-SA 3.0 |
+| 12 | peski-nikolaya.jpg | [Пескі (Мастоўскі раён). Царква Святога Мікалая (01).jpg](https://commons.wikimedia.org/wiki/File:%D0%9F%D0%B5%D1%81%D0%BA%D1%96_(%D0%9C%D0%B0%D1%81%D1%82%D0%BE%D1%9E%D1%81%D0%BA%D1%96_%D1%80%D0%B0%D1%91%D0%BD)._%D0%A6%D0%B0%D1%80%D0%BA%D0%B2%D0%B0_%D0%A1%D0%B2%D1%8F%D1%82%D0%BE%D0%B3%D0%B0_%D0%9C%D1%96%D0%BA%D0%B0%D0%BB%D0%B0%D1%8F_(01).jpg) | Валацуга (fgb.by) | CC BY-SA 3.0 |
+| 13 | dubno-nikolaya.jpg | [Дубно. Церковь Вознесения Господня.jpg](https://commons.wikimedia.org/wiki/File:%D0%94%D1%83%D0%B1%D0%BD%D0%BE._%D0%A6%D0%B5%D1%80%D0%BA%D0%BE%D0%B2%D1%8C_%D0%92%D0%BE%D0%B7%D0%BD%D0%B5%D1%81%D0%B5%D0%BD%D0%B8%D1%8F_%D0%93%D0%BE%D1%81%D0%BF%D0%BE%D0%B4%D0%BD%D1%8F.jpg) | Борис Мавлютов | CC BY-SA 3.0 |
+| 14 | lunno-sv-anna.jpg | [Лунна, касьцёл сьв. Ганны.jpg](https://commons.wikimedia.org/wiki/File:%D0%9B%D1%83%D0%BD%D0%BD%D0%B0,_%D0%BA%D0%B0%D1%81%D1%8C%D1%86%D1%91%D0%BB_%D1%81%D1%8C%D0%B2._%D0%93%D0%B0%D0%BD%D0%BD%D1%8B.jpg) | Futureal | CC BY-SA 3.0 |
+| 15 | mosty-pravye-ioanna.jpg | [047-260 Правые Мосты, костел, снято 16 апреля 2005.jpg](https://commons.wikimedia.org/wiki/File:047-260_%D0%9F%D1%80%D0%B0%D0%B2%D1%8B%D0%B5_%D0%9C%D0%BE%D1%81%D1%82%D1%8B,_%D0%BA%D0%BE%D1%81%D1%82%D0%B5%D0%BB,_%D1%81%D0%BD%D1%8F%D1%82%D0%BE_16_%D0%B0%D0%BF%D1%80%D0%B5%D0%BB%D1%8F_2005.jpg) | Globustut (globus.tut.by) | CC BY 4.0 |
+| 16 | peski-ruzhentsovoy.jpg | [Пескі. Касцёл Маці Божай Ружанцовай.jpg](https://commons.wikimedia.org/wiki/File:%D0%9F%D0%B5%D1%81%D0%BA%D1%96._%D0%9A%D0%B0%D1%81%D1%86%D1%91%D0%BB_%D0%9C%D0%B0%D1%86%D1%96_%D0%91%D0%BE%D0%B6%D0%B0%D0%B9_%D0%A0%D1%83%D0%B6%D0%B0%D0%BD%D1%86%D0%BE%D0%B2%D0%B0%D0%B9.jpg) | Андрэй Дзмітрыеў | CC BY-SA 3.0 |
+| 17 | bolshaya-rogoznitsa-marii.jpg | [Касцёл Дзевы Марыі. Вялікая Рагозніца.jpg](https://commons.wikimedia.org/wiki/File:%D0%9A%D0%B0%D1%81%D1%86%D1%91%D0%BB_%D0%94%D0%B7%D0%B5%D0%B2%D1%8B_%D0%9C%D0%B0%D1%80%D1%8B%D1%96._%D0%92%D1%8F%D0%BB%D1%96%D0%BA%D0%B0%D1%8F_%D0%A0%D0%B0%D0%B3%D0%BE%D0%B7%D0%BD%D1%96%D1%86%D0%B0.jpg) | Андрэй Дзмiтрыеў | CC BY-SA 3.0 |
+| 18 | strubnitsa-troitsky.jpg | [Струбніца. Касцёл.jpg](https://commons.wikimedia.org/wiki/File:%D0%A1%D1%82%D1%80%D1%83%D0%B1%D0%BD%D1%96%D1%86%D0%B0._%D0%9A%D0%B0%D1%81%D1%86%D1%91%D0%BB.jpg) | Валацуга (fgb.by) | CC BY-SA 3.0 |
+| 19 | mikelevshchina-poseshcheniya.jpg | [Мікелеўшчына. Касцёл.jpg](https://commons.wikimedia.org/wiki/File:%D0%9C%D1%96%D0%BA%D0%B5%D0%BB%D0%B5%D1%9E%D1%88%D1%87%D1%8B%D0%BD%D0%B0._%D0%9A%D0%B0%D1%81%D1%86%D1%91%D0%BB.jpg) | Валацуга (fgb.by) | CC BY-SA 3.0 |
+
+**Placeholder (4/19) — на Commons фото этих объектов не найдено:**
+- `mosty-iliinskiy` (Ильинская, кладбищенская) — поиск находит только чужие Ильинские
+  церкви (Петрозаводск и др.), корректного снимка нет → на сайте гравюра/иконка
+  с подписью «фото уточняется».
+- `mosty-sofii-sluckoy` (строится) — храм достраивается, общедоступных фото нет.
+- `kurilovichi-troitsy` (2022) — самый новый храм района, фото на Commons нет.
+- `cherlena-rozhdestva` (1871) — поиск находит только д. Плодовая (соседний НП),
+  корректного снимка нет.
+
+⚠ **Находка этапа 2 — посвящение церкви в Белавичах:** на Commons и в фотоисточниках
+действующая церковь называется **Свята-Ільінскай (Ильинской)**, тогда как в этапе 1
+зафиксировано «Покрова Пресв. Богородицы (1822)». Возможные объяснения: посвящение
+менялось со временем (есть фото «Бялавічы, Пакроўская (1900)» и «Бялавічы,
+Ільлінская (1930)»), либо в селе исторически было два храма. Фото на сайте — текущей
+(Ильинской) церкви. **На этапе 6 сверить посвящение по orthos.org и краеведческим
+источникам и зафиксировать решение в ledger.**
+
+⚠ **Примечание по фото Дубно:** снимок Б. Мавлютова подписан «Церковь Вознесения
+Господня» — это согласуется с легендой из этапа 1 (один из трёх престолов — Вознесения
+Господня; проект якобы готовился для украинского Дубна). Главный престол по orthos —
+Николая Чудотворца. Фото корректно показывает здание храма.
+
+**Техническая заметка (для этапа 6):** три файла (lunno-sv-anna, belavichi-pokrova,
+samuilovichi-nikolaya) в первом заходе скачались через прокси wsrv.nl без подтверждения
+источника — по правилу «без атрибуции — не использовать» они перекачаны напрямую с
+Commons и сверены по md5. Скрипты сверки: `.research/verify.py` (md5), `.research/dhash.py`
+(перцептивный хэш для перекодированных файлов).
 
 ## Контент (история 2–4 абзаца + факты) — черновик для этапа 6
 
@@ -105,6 +160,8 @@ planetabelarus — с 2015. На сайте: «строится (по разны
 Никогда не закрывалась. Церковный дом в советское время — под детский сад.
 Факты: строил костёл, стал православным; помещица Гонората Оскирко; не закрывалась
 в годы гонений; 1822.
+⚠ См. находку этапа 2: действующая церковь в источниках — Ильинская (сверить посвящение
+на этапе 6).
 
 ### 10. Куриловичи, Св. Троицы (2022) — orthos
 Новый храм. Великое освящение — 19 ноября 2022 архиепископом Гродненским и
@@ -202,3 +259,6 @@ planetabelarus — с 2015. На сайте: «строится (по разны
 - OSM Nominatim: геокодинг (подтверждение координат)
 - sobory.ru/geo/distr/2842, mosty.rajon.by (справочник), Википедия (костёл Иоанна
   Крестителя — история прихода с 1539)
+- Wikimedia Commons (этап 2): поиск по 19 объектам, лицензии CC BY / CC BY-SA, все
+  файлы сверены по md5 (скрипты .research/verify.py, .research/dhash.py,
+  .research/commons_search.py, .research/download_photos2.py)
