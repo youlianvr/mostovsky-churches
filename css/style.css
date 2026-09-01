@@ -1,28 +1,296 @@
 /* ============================================================
- * Храмы Мостовского района — единые стили
- * Скелет (этап 0). Дизайн-токены закладываются на этапе 3.
+ * Храмы Мостовского района — единые стили (этап 3: фундамент)
  *
- * Палитра (спецификация §9):
- *   фон      — #f5efdf (пергамент)
- *   тёмно-зелёный — #2f4a32
- *   охра     — #b58a4a
+ * Дизайн-токены (спецификация §9): краеведческий стиль —
+ * пергаментный фон, тёмно-зелёный + охра, серифная типографика.
+ * ЕДИНСТВЕННЫЙ источник стиля: инлайн-стили в HTML запрещены.
  * ============================================================ */
 
+/* ---------- Токены ---------- */
 :root {
-  --color-bg: #f5efdf;
-  --color-green: #2f4a32;
-  --color-ochre: #b58a4a;
-  --color-ink: #2b2b2b;
-  --color-card: #ffffff;
+  /* палитра */
+  --color-bg: #f5efdf;          /* пергамент — фон страницы */
+  --color-bg-soft: #ece2c8;     /* пергамент темнее — фон блоков */
+  --color-green: #2f4a32;       /* тёмно-зелёный — основной акцент */
+  --color-green-deep: #223824;  /* тёмно-зелёный для текста на светлом */
+  --color-ochre: #b58a4a;       /* охра — акценты, линии, метки */
+  --color-ochre-deep: #8a6530;  /* охра темнее — hover */
+  --color-ink: #2b2b2b;         /* основной текст */
+  --color-muted: #6b6253;       /* приглушённый текст */
+  --color-card: #fffdf5;        /* карточки (тёплый белый) */
+  --color-line: #d8cbab;        /* рамки, разделители */
+
+  /* типографика */
+  --font-serif: Georgia, "Times New Roman", "Liberation Serif", serif;
+  --font-body: Georgia, "Times New Roman", "Liberation Serif", serif;
+  --fs-hero: clamp(1.9rem, 4.5vw, 3rem);   /* заголовок главной */
+  --fs-h1: clamp(1.6rem, 3vw, 2.4rem);     /* заголовок раздела */
+  --fs-h2: clamp(1.25rem, 2vw, 1.6rem);    /* заголовок блока */
+  --fs-body: 1.06rem;
+  --fs-small: 0.88rem;
+
+  /* отступы и форма */
+  --space-xs: 0.35rem;
+  --space-sm: 0.7rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --radius: 6px;
+  --container-max: 1100px;
+  --line-height-body: 1.65;
+
+  /* иконография конфессий (этап 5, SVG) */
+  --marker-orthodox: circle;
+  --marker-catholic: square;
 }
 
+/* ---------- База ---------- */
 * { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
   background: var(--color-bg);
   color: var(--color-ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--line-height-body);
 }
 
-/* Навбар и подвал появятся в этапе 4 */
+img { max-width: 100%; height: auto; }
+
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--space-md);
+}
+
+/* Заголовки — серифные, крупный кегль (читаемость с проектора) */
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  color: var(--color-green-deep);
+  line-height: 1.2;
+  margin: 0 0 var(--space-sm);
+}
+
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); }
+
+.hero h1 { font-size: var(--fs-hero); }
+
+p { margin: 0 0 var(--space-md); }
+
+a {
+  color: var(--color-green);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+a:hover { color: var(--color-ochre-deep); }
+
+/* ---------- Навбар и подвал ---------- */
+.site-header {
+  background: var(--color-green);
+  border-bottom: 3px solid var(--color-ochre);
+}
+
+.navbar {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.navbar-brand {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  color: var(--color-bg);
+  text-decoration: none;
+  font-weight: bold;
+}
+.navbar-brand:hover { color: #d9c59a; }
+
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-links a {
+  color: var(--color-bg);
+  text-decoration: none;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius);
+}
+.navbar-links a:hover,
+.navbar-links a[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.site-footer {
+  margin-top: var(--space-xl);
+  padding: var(--space-lg) var(--space-md);
+  background: var(--color-green-deep);
+  color: #d8d0ba;
+  font-size: var(--fs-small);
+}
+.site-footer a { color: #e5d7ae; }
+.site-footer .container { text-align: center; }
+
+/* ---------- Карточки ---------- */
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+}
+
+/* Список маршрута (главная) */
+.route-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.route-list li {
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  border-left: 4px solid var(--color-ochre);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.route-step {
+  font-family: var(--font-serif);
+  font-weight: bold;
+  color: var(--color-ochre-deep);
+  min-width: 2rem;
+}
+
+/* ---------- Кнопки ---------- */
+.btn {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-green);
+  color: #fff;
+  border-radius: var(--radius);
+  text-decoration: none;
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  cursor: pointer;
+}
+.btn:hover { background: var(--color-ochre-deep); color: #fff; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-green);
+  border-color: var(--color-green);
+}
+.btn-ghost:hover { background: var(--color-green); color: #fff; }
+
+/* ---------- Панель фактов на странице храма ---------- */
+.fact-panel {
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: var(--space-md);
+  display: grid;
+  gap: var(--space-xs);
+  font-size: var(--fs-small);
+}
+.fact-panel dt {
+  font-weight: bold;
+  color: var(--color-green-deep);
+}
+.fact-panel dd { margin: 0 0 var(--space-xs); }
+
+/* ---------- Фото и подпись ---------- */
+.church-photo {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-card);
+}
+.church-photo img { display: block; width: 100%; }
+.church-photo figcaption {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--fs-small);
+  color: var(--color-muted);
+}
+
+/* Placeholder вместо фото */
+.photo-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  background: var(--color-bg-soft);
+  color: var(--color-muted);
+  font-style: italic;
+  text-align: center;
+  padding: var(--space-md);
+}
+
+/* ---------- Хлебные крошки ---------- */
+.crumbs {
+  font-size: var(--fs-small);
+  color: var(--color-muted);
+  margin-bottom: var(--space-md);
+}
+.crumbs a { color: var(--color-muted); }
+
+/* ---------- Схема (этап 5) ---------- */
+.map-schema {
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: var(--space-sm);
+}
+.map-schema svg { display: block; width: 100%; height: auto; }
+
+.legend {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  font-size: var(--fs-small);
+  margin-top: var(--space-sm);
+}
+.legend-item { display: inline-flex; align-items: center; gap: var(--space-xs); }
+.marker-sample {
+  width: 0.8rem;
+  height: 0.8rem;
+  display: inline-block;
+  background: var(--color-ochre);
+}
+.marker-sample.orthodox { border-radius: 50%; }
+
+/* ---------- Доступность ---------- */
+:focus-visible {
+  outline: 2px solid var(--color-ochre);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- Адаптивность (этап 7, базовая уже здесь) ---------- */
+@media (max-width: 640px) {
+  .navbar { flex-direction: column; align-items: flex-start; }
+  .navbar-links { flex-wrap: wrap; gap: var(--space-xs); }
+  .route-list li { flex-direction: column; align-items: flex-start; gap: var(--space-xs); }
+}
