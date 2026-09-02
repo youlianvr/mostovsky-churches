@@ -15,6 +15,7 @@ var CHURCHES = [
   {
     slug: "mosty-vseh-skorbyashchih",
     name: "Храм иконы Божией Матери «Всех скорбящих Радость»",
+    shortName: 'Всех скорбящих Радость',
     settlement: "г. Мосты",
     confession: "orthodox",
     built: "1994–1995",
@@ -41,6 +42,7 @@ var CHURCHES = [
   {
     slug: "mosty-bozhey-materi",
     name: "Костёл Божьей Матери",
+    shortName: 'Костёл Божьей Матери',
     settlement: "г. Мосты",
     confession: "catholic",
     built: "1992–2000",
@@ -67,6 +69,7 @@ var CHURCHES = [
   {
     slug: "mosty-iliinskiy",
     name: "Свято-Ильинская кладбищенская церковь",
+    shortName: 'Ильинская церковь',
     settlement: "г. Мосты",
     confession: "orthodox",
     built: "1910",
@@ -95,6 +98,7 @@ var CHURCHES = [
   {
     slug: "mosty-sofii-sluckoy",
     name: "Храм преподобной Софии Слуцкой",
+    shortName: 'Софии Слуцкой',
     settlement: "г. Мосты",
     confession: "orthodox",
     built: "строится",
@@ -124,6 +128,7 @@ var CHURCHES = [
   {
     slug: "pacevichi-rozhdestva",
     name: "Церковь Рождества Пресвятой Богородицы",
+    shortName: 'Рождества Богородицы, Пацевичи',
     settlement: "д. Пацевичи",
     confession: "orthodox",
     built: "1867",
@@ -149,6 +154,7 @@ var CHURCHES = [
   {
     slug: "samuilovichi-nikolaya",
     name: "Церковь Святителя Николая Чудотворца",
+    shortName: 'Николая Чудотворца, Самуйловичи',
     settlement: "д. Самуйловичи Дольные",
     confession: "orthodox",
     built: "1801",
@@ -177,6 +183,7 @@ var CHURCHES = [
   {
     slug: "lunno-predtechi",
     name: "Церковь Рождества Иоанна Предтечи",
+    shortName: 'Рождества Иоанна Предтечи',
     settlement: "д. Лунно",
     confession: "orthodox",
     built: "1889",
@@ -202,6 +209,7 @@ var CHURCHES = [
   {
     slug: "gudevichi-rozhdestva",
     name: "Церковь Рождества Пресвятой Богородицы",
+    shortName: 'Рождества Богородицы, Гудевичи',
     settlement: "д. Гудевичи",
     confession: "orthodox",
     built: "1852",
@@ -228,6 +236,7 @@ var CHURCHES = [
   {
     slug: "belavichi-pokrova",
     name: "Свято-Покровская церковь",
+    shortName: 'Покровская церковь',
     settlement: "д. Белавичи",
     confession: "orthodox",
     built: "1822",
@@ -259,6 +268,7 @@ var CHURCHES = [
   {
     slug: "kurilovichi-troitsy",
     name: "Храм Святой Живоначальной Троицы",
+    shortName: 'Живоначальной Троицы',
     settlement: "д. Куриловичи",
     confession: "orthodox",
     built: "2022",
@@ -285,6 +295,7 @@ var CHURCHES = [
   {
     slug: "cherlena-rozhdestva",
     name: "Церковь Рождества Пресвятой Богородицы",
+    shortName: 'Рождества Богородицы, Черлёна',
     settlement: "д. Черлёна",
     confession: "orthodox",
     built: "1871",
@@ -314,6 +325,7 @@ var CHURCHES = [
   {
     slug: "peski-nikolaya",
     name: "Церковь Святителя Николая Чудотворца",
+    shortName: 'Николая Чудотворца, Пески',
     settlement: "д. Пески",
     confession: "orthodox",
     built: "1870",
@@ -343,6 +355,7 @@ var CHURCHES = [
   {
     slug: "dubno-nikolaya",
     name: "Церковь Святителя Николая Чудотворца",
+    shortName: 'Николая Чудотворца, Дубно',
     settlement: "д. Дубно",
     confession: "orthodox",
     built: "1844",
@@ -372,6 +385,7 @@ var CHURCHES = [
   {
     slug: "lunno-sv-anna",
     name: "Костёл Святой Анны",
+    shortName: 'Костёл Св. Анны',
     settlement: "аг. Лунно",
     confession: "catholic",
     built: "1782",
@@ -401,6 +415,7 @@ var CHURCHES = [
   {
     slug: "mosty-pravye-ioanna",
     name: "Костёл Иоанна Крестителя",
+    shortName: 'Костёл Иоанна Крестителя',
     settlement: "д. Мосты Правые",
     confession: "catholic",
     built: "1992",
@@ -426,6 +441,7 @@ var CHURCHES = [
   {
     slug: "peski-ruzhentsovoy",
     name: "Костёл Богоматери Руженцовой",
+    shortName: 'Костёл Руженцовой',
     settlement: "аг. Пески",
     confession: "catholic",
     built: "1918",
@@ -452,6 +468,7 @@ var CHURCHES = [
   {
     slug: "bolshaya-rogoznitsa-marii",
     name: "Костёл Девы Марии",
+    shortName: 'Костёл Девы Марии',
     settlement: "аг. Большая Рогозница",
     confession: "catholic",
     built: "1926",
@@ -476,6 +493,7 @@ var CHURCHES = [
   {
     slug: "strubnitsa-troitsky",
     name: "Свято-Троицкий костёл",
+    shortName: 'Свято-Троицкий костёл',
     settlement: "д. Струбница (Плябановцы)",
     confession: "catholic",
     built: "1740",
@@ -501,6 +519,7 @@ var CHURCHES = [
   {
     slug: "mikelevshchina-poseshcheniya",
     name: "Костёл Посещения Девой Марией Елизаветы",
+    shortName: 'Костёл Посещения',
     settlement: "д. Микелевщина",
     confession: "catholic",
     built: "1820-е",

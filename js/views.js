@@ -1,7 +1,7 @@
 /* Page views: HTML presentation only. Routing and map state live elsewhere. */
 (function () {
   "use strict";
-  var app = document.getElementById("app");
+  function resolveApp() { return document.getElementById("app"); }
   var R = window.ChurchRouter;
 
   function escapeHtml(value) {
@@ -45,10 +45,12 @@
   function neighboursHtml(church) {
     var nb = R.routeNeighbours(church);
     return '<nav class="route-nav" aria-label="Навигация по маршруту">' +
-      (nb.prev ? '<a class="btn btn-ghost" href="#/' + nb.prev.slug + '">← ' + escapeHtml(nb.prev.settlement) + '</a>' : '<span></span>') +
-      (nb.next ? '<a class="btn" href="#/' + nb.next.slug + '">' + escapeHtml(nb.next.settlement) + ' →</a>' : '') + '</nav>';
+      (nb.prev ? '<a class="btn btn-ghost" href="#/' + nb.prev.slug + '">← ' + escapeHtml(nb.prev.shortName || nb.prev.name) + '</a>' : '<span></span>') +
+      (nb.next ? '<a class="btn" href="#/' + nb.next.slug + '">' + escapeHtml(nb.next.shortName || nb.next.name) + ' →</a>' : '') + '</nav>';
   }
   function renderHome() {
+    var app = resolveApp();
+    if (!app) { return; }
     var items = ROUTE.map(function (slug, index) {
       var church = R.findChurchBySlug(slug);
       return '<li><span class="route-step">' + (index + 1) + '</span>' + markerHtml(church) +
@@ -59,11 +61,15 @@
     if (schema && window.ChurchMap) { window.ChurchMap.renderSchema(schema); }
   }
   function renderChurch(church) {
+    var app = resolveApp();
+    if (!app) { return; }
     var confession = church.confession === "orthodox" ? "православный храм" : "католический костёл";
     var facts = church.facts.map(function (fact) { return '<li>' + escapeHtml(fact) + '</li>'; }).join("");
     app.innerHTML = '<p class="crumbs"><a href="#/">Главная</a> → <a href="#/">Маршрут</a> → <strong>' + escapeHtml(church.name) + '</strong></p><article class="church-page"><header class="church-head"><h1>' + escapeHtml(church.name) + '</h1><p class="church-subtitle">' + markerHtml(church) + ' ' + escapeHtml(church.settlement) + ' · ' + confession + '</p></header>' + photoHtml(church) + factsHtml(church, confession) + mapButtonsHtml(church) + '<h2>История</h2>' + church.history.map(function (paragraph) { return '<p>' + escapeHtml(paragraph) + '</p>'; }).join("") + '<h2>Интересные факты</h2><ul class="facts-list">' + facts + '</ul>' + sourcesHtml(church) + neighboursHtml(church) + '</article>';
   }
   function renderNotFound() {
+    var app = resolveApp();
+    if (!app) { return; }
     app.innerHTML = '<h1>Храм не найден</h1><p>Такой страницы нет. Возможно, ссылка устарела.</p><p><a class="btn" href="#/">Вернуться к маршруту</a></p>';
   }
 

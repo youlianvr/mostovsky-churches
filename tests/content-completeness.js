@@ -28,6 +28,9 @@ CHURCHES.forEach(function (church) {
     check(/https?:\/\//.test(church.photoCredit), prefix + "photo attribution needs a direct link");
   }
 });
+var shortNames = CHURCHES.map(function (church) { return church.shortName || ""; });
+check(shortNames.every(text), "every church needs a shortName for prev/next navigation");
+check(new Set(shortNames).size === CHURCHES.length, "shortName values must be unique for distinct prev/next labels");
 check(CHURCHES.some(function (church) { return church.slug === "mosty-iliinskiy" && /1910/.test(church.builtNote || ""); }), "mosty-iliinskiy: explicit date contradiction missing");
 check(CHURCHES.some(function (church) { return church.slug === "mosty-sofii-sluckoy" && /2011/.test(church.builtNote || "") && /2015/.test(church.builtNote || ""); }), "mosty-sofii-sluckoy: explicit date contradiction missing");
 check(CHURCHES.some(function (church) { return church.slug === "peski-ruzhentsovoy" && /1903/.test(church.builtNote || "") && /1915/.test(church.builtNote || "") && /1918/.test(church.builtNote || ""); }), "peski-ruzhentsovoy: explicit date contradiction missing");
