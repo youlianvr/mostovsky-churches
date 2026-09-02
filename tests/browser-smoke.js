@@ -13,17 +13,17 @@ const { chromium } = require("playwright");
   async function clickVisible(locator) { await locator.click({ position: { x: 5, y: 5 } }); }
 
   await page.goto(base + "#/map", { waitUntil: "networkidle" });
-  check(await page.locator(".map-route-line").getAttribute("points").then(points => points.trim().split(/\s+/).length) === 19, "route line must have 19 points");
-  check(await page.locator(".map-cluster").count() === 3, "map must render three clusters");
-  check(await page.locator(".map-marker-g").count() === 11, "map must render eleven singles");
+  check(await page.locator(".map-route-line").getAttribute("points").then(points => points.trim().split(/\s+/).length) === 12, "route line must have 12 points");
+  check(await page.locator(".map-cluster").count() === 1, "map must render one cluster");
+  check(await page.locator(".map-marker-g").count() === 9, "map must render nine singles");
   check(await page.locator("svg").evaluate(svg => getComputedStyle(svg).pointerEvents) === "none", "decorative SVG surface must not intercept clicks");
 
   await clickVisible(page.locator(".map-marker-g").first());
-  await page.waitForFunction(() => location.hash === "#/cherlena-rozhdestva");
+  await page.waitForFunction(() => location.hash === "#/lunno-predtechi");
   check(await page.locator("h1").textContent().then(text => text.includes("Рождества")), "singleton marker must open its church page");
 
   await page.goto(base + "#/map", { waitUntil: "networkidle" });
-  for (const [name, count] of [["Мосты", 4], ["Лунно", 2], ["Пески", 2]]) {
+  for (const [name, count] of [["Мосты", 3]]) {
     await clickVisible(page.locator('.map-cluster[data-cluster="' + name + '"]'));
     check(await page.locator(".cluster-popup").isVisible(), name + " cluster must open popup");
     check(await page.locator(".cluster-popup-list a").count() === count, name + " cluster count mismatch");
@@ -44,5 +44,5 @@ const { chromium } = require("playwright");
   check((await page.locator("h1").textContent()).trim() === "Храм не найден", "unknown slug must render 404");
   check(errors.length === 0, "browser console errors: " + errors.join(" | "));
   await browser.close();
-  console.log("browser contract v1 | pointer clicks, clusters, navigation, map links, #/map, 404: PASS");
+  console.log("browser contract v2 | pointer clicks, clusters, navigation, map links, #/map, 404: PASS");
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });

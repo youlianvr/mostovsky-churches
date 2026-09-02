@@ -42,7 +42,6 @@
 
   /* иконография конфессий (этап 5, SVG) */
   --marker-orthodox: circle;
-  --marker-catholic: square;
 }
 
 /* ---------- База ---------- */
@@ -437,7 +436,7 @@ a:hover { color: var(--color-ochre-deep); }
   opacity: 0.85;
 }
 
-/* Метки конфессий: круг = православный, квадрат = католический */
+/* Метки: круг = православный храм */
 .map-marker {
   fill: var(--color-ochre);
   stroke: var(--color-card);

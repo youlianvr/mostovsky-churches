@@ -9,7 +9,7 @@ var problems = [];
 function check(ok, message) { if (!ok) problems.push(message); }
 function text(value) { return typeof value === "string" && value.trim().length > 0; }
 
-check(CHURCHES.length === 19, "expected 19 church records");
+check(CHURCHES.length === 12, "expected 12 church records");
 CHURCHES.forEach(function (church) {
   var prefix = church.slug + ": ";
   check(text(church.slug) && text(church.name) && text(church.settlement), prefix + "identity incomplete");
@@ -33,8 +33,6 @@ check(shortNames.every(text), "every church needs a shortName for prev/next navi
 check(new Set(shortNames).size === CHURCHES.length, "shortName values must be unique for distinct prev/next labels");
 check(CHURCHES.some(function (church) { return church.slug === "mosty-iliinskiy" && /1910/.test(church.builtNote || ""); }), "mosty-iliinskiy: explicit date contradiction missing");
 check(CHURCHES.some(function (church) { return church.slug === "mosty-sofii-sluckoy" && /2011/.test(church.builtNote || "") && /2015/.test(church.builtNote || ""); }), "mosty-sofii-sluckoy: explicit date contradiction missing");
-check(CHURCHES.some(function (church) { return church.slug === "peski-ruzhentsovoy" && /1903/.test(church.builtNote || "") && /1915/.test(church.builtNote || "") && /1918/.test(church.builtNote || ""); }), "peski-ruzhentsovoy: explicit date contradiction missing");
-check(CHURCHES.some(function (church) { return church.slug === "strubnitsa-troitsky" && /Плябановцы/.test((church.settlement || "") + " " + (church.address || "")); }), "strubnitsa-troitsky: alternate name missing");
 var approx = CHURCHES.filter(function (church) { return church.coordsNote; });
 check(approx.length === 4, "expected four approximate coordinate records");
 console.log("content contract v1 | objects:", CHURCHES.length, "| approx:", approx.length, "| placeholders:", CHURCHES.filter(function (c) { return c.placeholder; }).length, "| PROBLEMS:", problems.length ? problems : "none");

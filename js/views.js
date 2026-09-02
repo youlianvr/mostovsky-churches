@@ -9,9 +9,8 @@
       .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
   function markerHtml(church) {
-    var label = church.confession === "orthodox" ? "православный храм" : "католический костёл";
-    return '<span class="marker-sample ' + (church.confession === "orthodox" ? "orthodox" : "") +
-      '" title="' + label + '" aria-label="' + label + '"></span>';
+    var label = "православный храм";
+    return '<span class="marker-sample orthodox" title="' + label + '" aria-label="' + label + '"></span>';
   }
   function photoHtml(church) {
     if (!church.placeholder && church.photo) {
@@ -56,14 +55,14 @@
       return '<li><span class="route-step">' + (index + 1) + '</span>' + markerHtml(church) +
         '<a class="route-name" href="#/' + church.slug + '">' + escapeHtml(church.name) + '</a><span class="route-settlement">' + escapeHtml(church.settlement) + '</span><a class="btn btn-ghost" href="#/' + church.slug + '">Открыть</a></li>';
     }).join("");
-    app.innerHTML = '<section class="hero"><p class="eyebrow">Исторический маршрут · 19 остановок</p><h1>Храмы Мостовского района</h1><p>Маршрут по 19 храмам Мостовского района Гродненской области — 12 православных церквей и 7 католических костёлов, от старейшего деревянного храма 1740 года до новейшей церкви 2022 года.</p><p class="hero-guide"><strong>С чего начать:</strong> выберите номер на схеме или откройте остановку ниже.</p></section><section class="map-schema" aria-label="Схема маршрута"><div class="legend"><span class="legend-item"><span class="marker-sample orthodox"></span> православный храм</span><span class="legend-item"><span class="marker-sample"></span> католический костёл</span></div></section><section><h2>Остановки маршрута</h2><ol class="route-list">' + items + '</ol></section>';
+    app.innerHTML = '<section class="hero"><p class="eyebrow">Исторический маршрут · 12 остановок</p><h1>Храмы Мостовского района</h1><p>Маршрут по 12 православным храмам Мостовского района Гродненской области — от старейшей церкви 1801 года в Самуйловичах до новейшего храма 2022 года в Куриловичах.</p><p class="hero-guide"><strong>С чего начать:</strong> выберите номер на схеме или откройте остановку ниже.</p></section><section class="map-schema" aria-label="Схема маршрута"><div class="legend"><span class="legend-item"><span class="marker-sample orthodox"></span> православный храм</span></div></section><section><h2>Остановки маршрута</h2><ol class="route-list">' + items + '</ol></section>';
     var schema = document.querySelector(".map-schema");
     if (schema && window.ChurchMap) { window.ChurchMap.renderSchema(schema); }
   }
   function renderChurch(church) {
     var app = resolveApp();
     if (!app) { return; }
-    var confession = church.confession === "orthodox" ? "православный храм" : "католический костёл";
+    var confession = "православный храм";
     var facts = church.facts.map(function (fact) { return '<li>' + escapeHtml(fact) + '</li>'; }).join("");
     app.innerHTML = '<p class="crumbs"><a href="#/">Главная</a> → <a href="#/">Маршрут</a> → <strong>' + escapeHtml(church.name) + '</strong></p><article class="church-page"><header class="church-head"><h1>' + escapeHtml(church.name) + '</h1><p class="church-subtitle">' + markerHtml(church) + ' ' + escapeHtml(church.settlement) + ' · ' + confession + '</p></header>' + photoHtml(church) + factsHtml(church, confession) + mapButtonsHtml(church) + '<h2>История</h2>' + church.history.map(function (paragraph) { return '<p>' + escapeHtml(paragraph) + '</p>'; }).join("") + '<h2>Интересные факты</h2><ul class="facts-list">' + facts + '</ul>' + sourcesHtml(church) + neighboursHtml(church) + '</article>';
   }

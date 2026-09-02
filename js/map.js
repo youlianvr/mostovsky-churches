@@ -61,7 +61,7 @@
     function showCluster(cluster) {
       title.textContent = cluster.name + " — " + cluster.members.length + " храма";
       list.innerHTML = cluster.members.map(function (member) {
-        var confession = member.confession === "orthodox" ? "православный" : "католический";
+        var confession = "православный";
         return '<li><a href="#/' + escapeAttr(member.slug) + '"><span class="cluster-step">' + member.step +
           '</span> ' + escapeAttr(member.name) + '</a><span class="cluster-conf">' + confession + '</span></li>';
       }).join("");
