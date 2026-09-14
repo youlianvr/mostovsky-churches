@@ -395,7 +395,7 @@ a:hover { color: var(--color-ochre-deep); }
   pointer-events: none;
 }
 .map-schema svg .map-marker-g,
-.map-schema svg .map-cluster { pointer-events: all; }
+.map-schema svg .map-cluster { pointer-events: bounding-box; }
 
 .map-background {
   pointer-events: none;
@@ -433,12 +433,22 @@ a:hover { color: var(--color-ochre-deep); }
   stroke-dasharray: 7 5;
 }
 
+.map-route-line-casing {
+  fill: none;
+  stroke: var(--color-card);
+  stroke-width: 7;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+
 .map-route-line {
   fill: none;
   stroke: var(--color-ochre-deep);
-  stroke-width: 2.5;
-  stroke-dasharray: 6 5;
-  opacity: 0.85;
+  stroke-width: 3.5;
+  stroke-dasharray: 9 6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 /* Метки: круг = православный храм */
@@ -451,9 +461,15 @@ a:hover { color: var(--color-ochre-deep); }
   fill: var(--color-green);
 }
 .map-marker-g { cursor: pointer; pointer-events: bounding-box; }
-.map-cluster { cursor: pointer; }
+.map-cluster { cursor: pointer; pointer-events: bounding-box; }
 .map-cluster .map-marker {
   stroke-width: 2.5;
+}
+/* Cluster halo: distinct "several temples here" code, readable at projector distance */
+.map-cluster-halo {
+  fill: var(--color-card);
+  stroke: var(--color-green-deep);
+  stroke-width: 1.5;
 }
 .map-cluster .map-marker-label {
   font-weight: bold;
@@ -488,6 +504,42 @@ a:hover { color: var(--color-ochre-deep); }
 .map-cluster:focus .map-marker {
   stroke: var(--color-ochre-deep);
   stroke-width: 3;
+}
+.map-cluster:hover .map-cluster-halo,
+.map-cluster:focus .map-cluster-halo {
+  stroke: var(--color-ochre-deep);
+}
+
+/* Horizontal scroll affordance for the map on mobile (DG-Map) */
+.map-scroll-hint {
+  display: none;
+  margin: var(--space-xs) 0 0;
+  color: var(--color-muted);
+  font-size: var(--fs-small);
+  text-align: center;
+}
+.map-schema.is-scrollable .map-scroll-hint { display: block; }
+.map-scroll-hint .map-scroll-arrow { display: inline-block; animation: map-hint-nudge 1.6s ease-in-out infinite; }
+@keyframes map-hint-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-scroll-hint .map-scroll-arrow { animation: none; }
+}
+/* Edge fade while the map can still scroll in that direction (JS-managed classes) */
+.map-schema.is-scrollable {
+  --map-fade: 28px;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--map-fade), #000 calc(100% - var(--map-fade)), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--map-fade), #000 calc(100% - var(--map-fade)), transparent 100%);
+}
+.map-schema.is-scrollable.is-at-start {
+  -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - var(--map-fade)), transparent 100%);
+  mask-image: linear-gradient(to right, #000 0, #000 calc(100% - var(--map-fade)), transparent 100%);
+}
+.map-schema.is-scrollable.is-at-end {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--map-fade), #000 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 var(--map-fade), #000 100%);
 }
 
 /* Попап выбора храмов в кластере (DG4) */
@@ -574,6 +626,15 @@ a:hover { color: var(--color-ochre-deep); }
   .route-nav { gap: var(--space-sm); }
   .route-nav .btn { max-width: 48%; text-align: center; }
   .map-schema { margin-left: calc(-1 * var(--content-gutter)); margin-right: calc(-1 * var(--content-gutter)); border-left: 0; border-right: 0; border-radius: 0; }
+
+  /* Effective sizes on mobile: the SVG scales down, so user units grow
+     to keep labels and the route line readable (Stage 2) */
+  .map-marker-label { font-size: 19px; stroke-width: 5; }
+  .map-marker-num { font-size: 17px; }
+  .map-water-label { font-size: 17px; }
+  .map-route-line { stroke-width: 4.5; }
+  .map-route-line-casing { stroke-width: 8.5; }
+  .map-road { stroke-width: 3.5; }
 }
 
 @media (max-width: 420px) {

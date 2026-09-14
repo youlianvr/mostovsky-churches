@@ -17,6 +17,8 @@
     var label = cluster.name + " · " + cluster.members.length + " храма";
     return '<g class="map-cluster" data-cluster="' + escapeAttr(cluster.name) + '" data-step="' + step +
       '" role="button" tabindex="0" aria-label="' + escapeAttr(cluster.name + ': ' + cluster.members.length + ' храма — открыть выбор') + '">' +
+      '<circle class="map-cluster-halo" cx="' + cluster.x.toFixed(1) +
+      '" cy="' + cluster.y.toFixed(1) + '" r="21" aria-hidden="true"/>' +
       '<circle class="map-marker ' + confessionClass(cluster.members[0].confession) + '" cx="' + cluster.x.toFixed(1) +
       '" cy="' + cluster.y.toFixed(1) + '" r="15"/>' +
       '<text class="map-marker-num" x="' + cluster.x.toFixed(1) + '" y="' + cluster.y.toFixed(1) + '">' + step + '</text>' +
@@ -44,6 +46,7 @@
       '<text class="map-water-label" x="' + riverMid[0] + '" y="' + (parseFloat(riverMid[1]) - 8) + '">р. Неман</text>' +
       G.ROADS.map(function (road) { return '<path class="map-road" d="' + G.pathString(road, false) + '"/>'; }).join("") +
       '</g>' +
+      '<polyline class="map-route-line-casing" points="' + data.points.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ") + '"/>' +
       '<polyline class="map-route-line" points="' + data.points.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ") + '"/>' +
       data.clusters.map(clusterMarkup).join("") + data.singles.map(singleMarkup).join("") + '</svg>';
   }
@@ -52,7 +55,8 @@
     var data = G.buildSchemaData();
     el.innerHTML = renderSvg(data) + '<div class="cluster-popup" hidden>' +
       '<button type="button" class="cluster-popup-close" aria-label="Закрыть">×</button>' +
-      '<h3 class="cluster-popup-title"></h3><ul class="cluster-popup-list"></ul></div>';
+      '<h3 class="cluster-popup-title"></h3><ul class="cluster-popup-list"></ul></div>' +
+      '<p class="map-scroll-hint" aria-hidden="true">Схема широкая — прокручивайте <span class="map-scroll-arrow">→</span></p>';
     var svg = el.querySelector("svg");
     G.resolveLabelCollisions(svg);
     var popup = el.querySelector(".cluster-popup");
@@ -73,6 +77,25 @@
         if (data.clusters[i].name === name) { showCluster(data.clusters[i]); return; }
       }
     }
+    // Edge fades + hint only while the schema actually overflows (mobile)
+    var scrollBox = el.classList.contains("map-schema") ? el : el.querySelector(".map-schema");
+    function updateScrollState() {
+      if (!scrollBox) { return; }
+      var max = scrollBox.scrollWidth - scrollBox.clientWidth;
+      if (max <= 2) {
+        scrollBox.classList.remove("is-scrollable", "is-at-start", "is-at-end");
+        return;
+      }
+      scrollBox.classList.add("is-scrollable");
+      scrollBox.classList.toggle("is-at-start", scrollBox.scrollLeft <= 2);
+      scrollBox.classList.toggle("is-at-end", scrollBox.scrollLeft >= max - 2);
+    }
+    if (scrollBox) {
+      scrollBox.addEventListener("scroll", updateScrollState, { passive: true });
+      window.addEventListener("resize", updateScrollState);
+    }
+    updateScrollState();
+
     el.addEventListener("click", function (event) {
       var target = event.target;
       var group = target.closest ? target.closest("[data-slug], [data-cluster]") : null;
