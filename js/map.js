@@ -70,11 +70,24 @@
           '</span> ' + escapeAttr(member.name) + '</a><span class="cluster-conf">' + confession + '</span></li>';
       }).join("");
       popup.hidden = false;
+      requestAnimationFrame(function () { popup.classList.add("is-open"); });
       list.querySelector("a").focus();
+    }
+    var lastTrigger = null;
+    function closeCluster() {
+      if (popup.hidden) { return; }
+      popup.hidden = true;
+      popup.classList.remove("is-open");
+      if (lastTrigger && typeof lastTrigger.focus === "function") { lastTrigger.focus(); }
+      lastTrigger = null;
     }
     function openCluster(name) {
       for (var i = 0; i < data.clusters.length; i++) {
-        if (data.clusters[i].name === name) { showCluster(data.clusters[i]); return; }
+        if (data.clusters[i].name === name) {
+          showCluster(data.clusters[i]);
+          if (popup.scrollIntoView) { popup.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+          return;
+        }
       }
     }
     // Edge fades + hint only while the schema actually overflows (mobile)
@@ -101,7 +114,7 @@
       var group = target.closest ? target.closest("[data-slug], [data-cluster]") : null;
       if (!group) { return; }
       if (group.hasAttribute("data-slug")) { window.location.hash = "#/" + group.getAttribute("data-slug"); }
-      else { openCluster(group.getAttribute("data-cluster")); }
+      else { lastTrigger = group; openCluster(group.getAttribute("data-cluster")); }
     });
     el.addEventListener("keydown", function (event) {
       if (event.key !== "Enter" && event.key !== " ") { return; }
@@ -109,9 +122,22 @@
       if (!group || !group.hasAttribute) { return; }
       event.preventDefault();
       if (group.hasAttribute("data-slug")) { window.location.hash = "#/" + group.getAttribute("data-slug"); }
-      else if (group.hasAttribute("data-cluster")) { openCluster(group.getAttribute("data-cluster")); }
+      else if (group.hasAttribute("data-cluster")) { lastTrigger = group; openCluster(group.getAttribute("data-cluster")); }
     });
-    el.querySelector(".cluster-popup-close").addEventListener("click", function () { popup.hidden = true; });
+    el.querySelector(".cluster-popup-close").addEventListener("click", closeCluster);
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape") { return; }
+      if (!popup.hidden) { closeCluster(); }
+    });
+    // Tab cycling inside the popup while it is open (focus trap)
+    popup.addEventListener("keydown", function (event) {
+      if (event.key !== "Tab" || popup.hidden) { return; }
+      var focusable = popup.querySelectorAll("a[href], button");
+      if (!focusable.length) { return; }
+      var first = focusable[0], last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
   }
 
   window.ChurchMap = { renderSchema: renderSchema, buildSchemaData: G.buildSchemaData, proj: G.project };

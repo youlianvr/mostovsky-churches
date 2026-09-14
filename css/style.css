@@ -550,6 +550,16 @@ a:hover { color: var(--color-ochre-deep); }
   background: var(--color-card);
   border: 1px solid var(--color-line);
   box-shadow: 0 6px 18px rgba(43, 36, 26, 0.18);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.cluster-popup.is-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cluster-popup { transition: none; transform: none; }
   border-radius: var(--radius);
 }
 .cluster-popup[hidden] { display: none; }
