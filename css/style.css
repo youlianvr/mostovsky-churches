@@ -290,6 +290,25 @@ a:hover { color: var(--color-ochre-deep); }
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+.hero-ribbon {
+  display: block;
+  width: min(100%, 340px);
+  height: auto;
+  margin: 0 0 var(--space-xs);
+  opacity: 0.85;
+}
+.hero-ribbon-line {
+  fill: none;
+  stroke: var(--color-ochre-deep);
+  stroke-width: 2.5;
+  stroke-dasharray: 8 6;
+  stroke-linecap: round;
+}
+.hero-ribbon circle { fill: var(--color-ochre-deep); }
+@media (prefers-reduced-motion: no-preference) {
+  .hero-ribbon { transition: opacity 0.3s ease; }
+}
+
 .hero-guide {
   max-width: 60ch;
   padding: var(--space-sm) var(--space-md);

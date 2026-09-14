@@ -81,6 +81,30 @@
       });
     });
   }
+  /* Decorative route-line ribbon for the hero: same projected points as the
+     big schema, squashed and rendered as a dashed ochre line with stops. */
+  function heroRibbonHtml() {
+    if (!window.ChurchMapGeometry) { return ""; }
+    var G = window.ChurchMapGeometry;
+    var pts = ROUTE.map(function (slug) {
+      var c = R.findChurchBySlug(slug);
+      var p = G.project(c.coords.lat, c.coords.lon);
+      return { x: p.x, y: p.y };
+    });
+    var w = 1000, h = 90, sx = w / G.W;
+    var minY = Math.min.apply(null, pts.map(function (p) { return p.y; }));
+    var maxY = Math.max.apply(null, pts.map(function (p) { return p.y; }));
+    var sy = (h - 24) / Math.max(maxY - minY, 1);
+    var flat = pts.map(function (p) {
+      return (p.x * sx).toFixed(1) + "," + (12 + (p.y - minY) * sy).toFixed(1);
+    });
+    var dots = flat.map(function (xy, i) {
+      var coord = xy.split(",");
+      return '<circle cx="' + coord[0] + '" cy="' + coord[1] + '" r="' + (i === 0 || i === flat.length - 1 ? 5 : 3.5) + '"/>';
+    }).join("");
+    return '<svg class="hero-ribbon" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true" focusable="false">' +
+      '<polyline class="hero-ribbon-line" points="' + flat.join(" ") + '"/>' + dots + '</svg>';
+  }
   function renderHome() {
     var app = resolveApp();
     if (!app) { return; }
@@ -89,7 +113,7 @@
       return '<li data-slug="' + church.slug + '"><span class="route-step">' + (index + 1) + '</span>' + markerHtml(church) +
         '<a class="route-name" href="#/' + church.slug + '">' + escapeHtml(church.name) + '</a><span class="route-settlement">' + escapeHtml(church.settlement) + '</span><a class="btn btn-ghost" href="#/' + church.slug + '">Открыть</a></li>';
     }).join("");
-    app.innerHTML = '<section class="hero"><p class="eyebrow">Исторический маршрут · 12 остановок</p><h1>Храмы Мостовского района</h1><p>Маршрут по 12 православным храмам Мостовского района Гродненской области — от старейшей церкви 1801 года в Самуйловичах до новейшего храма 2022 года в Куриловичах.</p><p class="hero-guide"><strong>С чего начать:</strong> выберите номер на схеме или откройте остановку ниже.</p></section><section class="map-schema" aria-label="Схема маршрута"><div class="legend"><span class="legend-item"><span class="marker-sample orthodox"></span> православный храм</span></div></section><section><h2>Остановки маршрута</h2><ol class="route-list">' + items + '</ol></section>';
+    app.innerHTML = '<section class="hero">' + heroRibbonHtml() + '<p class="eyebrow">Исторический маршрут · 12 остановок</p><h1>Храмы Мостовского района</h1><p>Маршрут по 12 православным храмам Мостовского района Гродненской области — от старейшей церкви 1801 года в Самуйловичах до новейшего храма 2022 года в Куриловичах.</p><p class="hero-guide"><strong>С чего начать:</strong> выберите номер на схеме или откройте остановку ниже.</p></section><section class="map-schema" aria-label="Схема маршрута"><div class="legend"><span class="legend-item"><span class="marker-sample orthodox"></span> православный храм</span></div></section><section><h2>Остановки маршрута</h2><ol class="route-list">' + items + '</ol></section>';
     var schema = document.querySelector(".map-schema");
     if (schema && window.ChurchMap) { window.ChurchMap.renderSchema(schema); }
     wireMapListSync(schema);
