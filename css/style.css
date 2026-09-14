@@ -627,6 +627,24 @@ a:hover { color: var(--color-ochre-deep); }
 @media (min-width: 1200px) {
   :root { --fs-body: 1.12rem; --line-height-body: 1.7; }
   .hero { padding-top: var(--space-xl); }
+
+  /* Страница храма: фото + факты слева, текст справа (Stage 5).
+     На мобильных .church-side/.church-body остаются обычным потоком. */
+  .church-page {
+    display: grid;
+    grid-template-columns: minmax(320px, 5fr) 7fr;
+    gap: var(--space-lg) var(--space-xl);
+    align-items: start;
+  }
+  .church-head { grid-column: 1 / -1; }
+  .church-side {
+    display: grid;
+    gap: var(--space-md);
+    align-content: start;
+  }
+  .church-side .fact-panel { margin: 0; }
+  .church-side .map-buttons { margin: 0; }
+  .route-nav { grid-column: 1 / -1; }
 }
 
 @media (max-width: 720px) {

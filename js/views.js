@@ -99,7 +99,7 @@
     if (!app) { return; }
     var confession = "православный храм";
     var facts = church.facts.map(function (fact) { return '<li>' + escapeHtml(fact) + '</li>'; }).join("");
-    app.innerHTML = '<p class="crumbs"><a href="#/">Главная</a> → <a href="#/">Маршрут</a> → <strong>' + escapeHtml(church.name) + '</strong></p><article class="church-page"><header class="church-head"><h1>' + escapeHtml(church.name) + '</h1><p class="church-subtitle">' + markerHtml(church) + ' ' + escapeHtml(church.settlement) + ' · ' + confession + '</p></header>' + photoHtml(church) + factsHtml(church, confession) + mapButtonsHtml(church) + '<h2>История</h2>' + church.history.map(function (paragraph) { return '<p>' + escapeHtml(paragraph) + '</p>'; }).join("") + '<h2>Интересные факты</h2><ul class="facts-list">' + facts + '</ul>' + sourcesHtml(church) + neighboursHtml(church) + '</article>';
+    app.innerHTML = '<p class="crumbs"><a href="#/">Главная</a> → <a href="#/">Маршрут</a> → <strong>' + escapeHtml(church.name) + '</strong></p><article class="church-page"><header class="church-head"><h1>' + escapeHtml(church.name) + '</h1><p class="church-subtitle">' + markerHtml(church) + ' ' + escapeHtml(church.settlement) + ' · ' + confession + '</p></header><div class="church-side">' + photoHtml(church) + factsHtml(church, confession) + mapButtonsHtml(church) + '</div><div class="church-body"><h2>История</h2>' + church.history.map(function (paragraph) { return '<p>' + escapeHtml(paragraph) + '</p>'; }).join("") + '<h2>Интересные факты</h2><ul class="facts-list">' + facts + '</ul>' + sourcesHtml(church) + '</div>' + neighboursHtml(church) + '</article>';
   }
   function renderNotFound() {
     var app = resolveApp();
