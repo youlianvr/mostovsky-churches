@@ -188,6 +188,11 @@ a:hover { color: var(--color-ochre-deep); }
   align-items: center;
   gap: var(--space-md);
   flex-wrap: wrap;
+  transition: background-color 0.15s ease;
+}
+.route-list li.is-active { background: var(--color-bg-soft); }
+@media (prefers-reduced-motion: reduce) {
+  .route-list li { transition: none; }
 }
 
 .route-step {
@@ -501,7 +506,8 @@ a:hover { color: var(--color-ochre-deep); }
 .map-marker-g:hover .map-marker,
 .map-marker-g:focus .map-marker,
 .map-cluster:hover .map-marker,
-.map-cluster:focus .map-marker {
+.map-cluster:focus .map-marker,
+.map-marker-g.is-highlighted .map-marker {
   stroke: var(--color-ochre-deep);
   stroke-width: 3;
 }
