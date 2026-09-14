@@ -198,7 +198,10 @@ a:hover { color: var(--color-ochre-deep); }
 .route-step {
   font-family: var(--font-serif);
   font-weight: bold;
+  font-style: italic;
   color: var(--color-ochre-deep);
+  font-size: 1.5em;
+  line-height: 1;
   min-width: 2rem;
 }
 
@@ -605,6 +608,7 @@ a:hover { color: var(--color-ochre-deep); }
   min-width: 1.6rem;
   color: var(--color-ochre-deep);
   font-weight: bold;
+  font-style: italic;
 }
 
 .cluster-conf {
