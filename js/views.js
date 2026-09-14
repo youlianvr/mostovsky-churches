@@ -122,6 +122,30 @@
     return '<svg class="hero-ribbon" viewBox="0 0 ' + w + ' ' + h + '" aria-hidden="true" focusable="false">' +
       '<polyline class="hero-ribbon-line" points="' + flat.join(" ") + '"/>' + dots + '</svg>';
   }
+  /* Locator map: the district outline with the current stop highlighted.
+     Reuses the same projected geometry as the home schema — no new assets. */
+  function locatorHtml(church) {
+    if (!window.ChurchMapGeometry) { return ""; }
+    var G = window.ChurchMapGeometry;
+    var pts = ROUTE.map(function (slug) {
+      var c = R.findChurchBySlug(slug);
+      var p = G.project(c.coords.lat, c.coords.lon);
+      return { name: c.shortName, x: p.x, y: p.y, current: c.slug === church.slug };
+    });
+    var circles = pts.map(function (p) {
+      return '<circle class="locator-point' + (p.current ? " is-current" : "") +
+        '" cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + (p.current ? 11 : 6) + '"/>';
+    }).join("");
+    var cur = pts.filter(function (p) { return p.current; })[0];
+    var label = cur ? '<text class="locator-label" x="' + (cur.x + 16).toFixed(1) + '" y="' + (cur.y + 5).toFixed(1) + '">' +
+      escapeHtml(church.shortName) + '</text>' : "";
+    return '<figure class="locator-map"><svg viewBox="0 0 ' + G.W + ' ' + G.H +
+      '" aria-hidden="true" focusable="false">' +
+      '<path class="locator-district" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
+      '<path class="locator-river" d="' + G.pathString(G.RIVER, false) + '"/>' +
+      circles + label + '</svg>' +
+      '<figcaption>Положение на схеме района: ' + escapeHtml(church.settlement) + '</figcaption></figure>';
+  }
   function renderHome() {
     var app = resolveApp();
     if (!app) { return; }
@@ -131,6 +155,7 @@
         '<a class="route-name" href="#/' + church.slug + '">' + escapeHtml(church.name) + '</a><span class="route-settlement">' + escapeHtml(church.settlement) + '</span><a class="btn btn-ghost" href="#/' + church.slug + '">Открыть</a></li>';
     }).join("");
     app.innerHTML = '<section class="hero">' + heroRibbonHtml() + '<p class="eyebrow">Исторический маршрут · 3 остановки</p><h1>Храмы Мостовского района</h1><p>Маршрут по трём православным храмам Мостовского района Гродненской области — Гудевичи, Пески и Дубно: сельские церкви XIX века, каждая со своей историей и характером.</p><p class="hero-guide"><strong>С чего начать:</strong> выберите номер на схеме или откройте остановку ниже.</p></section><section class="map-schema" aria-label="Схема маршрута"><div class="legend"><span class="legend-item"><span class="marker-sample orthodox"></span> православный храм</span></div></section><section><h2>Остановки маршрута</h2><ol class="route-list">' + items + '</ol></section>';
+    document.title = "Храмы Мостовского района";
     var schema = document.querySelector(".map-schema");
     if (schema && window.ChurchMap) { window.ChurchMap.renderSchema(schema); }
     wireMapListSync(schema);
@@ -140,7 +165,8 @@
     if (!app) { return; }
     var confession = "православный храм";
     var facts = church.facts.map(function (fact) { return '<li>' + escapeHtml(fact) + '</li>'; }).join("");
-    app.innerHTML = '<p class="crumbs"><a href="#/">Главная</a> → <a href="#/">Маршрут</a> → <strong>' + escapeHtml(church.name) + '</strong></p><article class="church-page"><header class="church-head"><h1>' + escapeHtml(church.name) + '</h1><p class="church-subtitle">' + markerHtml(church) + ' ' + escapeHtml(church.settlement) + ' · ' + confession + '</p></header><div class="church-side">' + photoHtml(church) + factsHtml(church, confession) + mapButtonsHtml(church) + '</div><div class="church-body"><h2>История</h2>' + church.history.map(function (paragraph) { return '<p>' + escapeHtml(paragraph) + '</p>'; }).join("") + '<h2>Интересные факты</h2><ul class="facts-list">' + facts + '</ul>' + sourcesHtml(church) + '</div>' + neighboursHtml(church) + '</article>';
+    document.title = escapeHtml(church.name) + ' — ' + escapeHtml(church.settlement) + ' · Храмы Мостовского района';
+    app.innerHTML = '<p class="crumbs"><a href="#/">Главная</a> → <a href="#/">Маршрут</a> → <strong>' + escapeHtml(church.name) + '</strong></p><article class="church-page"><header class="church-head"><p class="church-eyebrow">Остановка ' + church.routeStep + ' из ' + ROUTE.length + '</p><h1>' + escapeHtml(church.name) + '</h1><p class="church-subtitle">' + markerHtml(church) + ' ' + escapeHtml(church.settlement) + ' · ' + confession + '</p></header><div class="church-side">' + photoHtml(church) + locatorHtml(church) + factsHtml(church, confession) + mapButtonsHtml(church) + '</div><div class="church-body"><h2>История</h2>' + church.history.map(function (paragraph) { return '<p>' + escapeHtml(paragraph) + '</p>'; }).join("") + '<h2>Интересные факты</h2><ul class="facts-list">' + facts + '</ul>' + sourcesHtml(church) + '</div>' + neighboursHtml(church) + '</article>';
   }
   function renderNotFound() {
     var app = resolveApp();
