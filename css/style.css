@@ -270,6 +270,56 @@ a:hover { color: var(--color-ochre-deep); }
   padding: var(--space-md);
 }
 
+/* Map-excerpt placeholder: фрагмент схемы района вместо пустой плашки */
+.photo-placeholder--map {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-card);
+}
+.photo-placeholder--map svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.photo-placeholder--map .ph-district {
+  fill: #efe4ca;
+  stroke: var(--color-ochre);
+  stroke-width: 2;
+}
+.photo-placeholder--map .ph-river {
+  fill: none;
+  stroke: #93a9ba;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.photo-placeholder--map .ph-marker {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: var(--color-green);
+  border: 2px solid var(--color-card);
+  box-shadow: 0 0 0 2px var(--color-ochre-deep);
+}
+.photo-placeholder--map .ph-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-xs) var(--space-sm);
+  background: rgba(255, 253, 245, 0.92);
+  color: var(--color-muted);
+  font-size: var(--fs-small);
+}
+
+.photo-review-note { font-style: italic; }
+
 /* ---------- Хлебные крошки ---------- */
 .crumbs {
   font-size: var(--fs-small);

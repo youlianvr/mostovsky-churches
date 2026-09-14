@@ -18,7 +18,24 @@
       var text = parts[0] || church.photoCredit;
       var url = parts.length > 1 ? parts[1] : "";
       var credit = url ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + escapeHtml(text) + '</a>' : escapeHtml(text);
-      return '<figure class="church-photo"><img src="' + escapeHtml(church.photo) + '" alt="' + escapeHtml(church.name) + '" loading="lazy"><figcaption>Фото: ' + credit + '</figcaption></figure>';
+      var reviewNote = church.needsLicenseReview ? ' <span class="photo-review-note">(источник уточняется)</span>' : '';
+      return '<figure class="church-photo"><img src="' + escapeHtml(church.photo) + '" alt="' + escapeHtml(church.name) + '" loading="lazy"><figcaption>Фото: ' + credit + reviewNote + '</figcaption></figure>';
+    }
+    if (window.ChurchMapGeometry) {
+      /* Honest placeholder: an excerpt of the district scheme centered on
+         this stop, so the card carries real information instead of empty text. */
+      var G = window.ChurchMapGeometry;
+      var p = G.project(church.coords.lat, church.coords.lon);
+      var w = 360, h = 220;
+      var cx = Math.min(Math.max(p.x, w / 2), G.W - w / 2);
+      var cy = Math.min(Math.max(p.y, h / 2), G.H - h / 2);
+      return '<div class="photo-placeholder photo-placeholder--map" role="img" aria-label="Фото храма уточняется; фрагмент схемы района с отметкой храма">' +
+        '<svg viewBox="' + (cx - w / 2).toFixed(0) + ' ' + (cy - h / 2).toFixed(0) + ' ' + w + ' ' + h + '" aria-hidden="true" focusable="false">' +
+        '<path class="ph-district" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
+        '<path class="ph-river" d="' + G.pathString(G.RIVER, false) + '"/>' +
+        '</svg>' +
+        '<span class="ph-marker" aria-hidden="true"></span>' +
+        '<span class="ph-caption">Фото уточняется</span></div>';
     }
     return '<div class="photo-placeholder" role="img" aria-label="Фото храма уточняется">Фото уточняется</div>';
   }
