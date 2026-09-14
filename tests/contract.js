@@ -19,17 +19,26 @@ var Router = window.ChurchRouter;
 var Views = window.ChurchViews;
 function find(slug) { return Router.findChurchBySlug(slug); }
 
-/* Data boundary: the approved route is exactly 12 orthodox objects (DG8). */
-check(CHURCHES.length === 12, "CHURCHES must contain 12 objects");
-check(ROUTE.length === 12, "ROUTE must contain 12 steps");
-check(new Set(ROUTE).size === 12, "ROUTE must not duplicate slugs");
+/* Data boundary: the approved focus set is exactly 3 objects
+ * (owner decision 2026-09-14: Гудевичи, Пески, Дубно). */
+var APPROVED = ["gudevichi-rozhdestva", "peski-nikolaya", "dubno-nikolaya"];
+check(CHURCHES.length === 3, "CHURCHES must contain 3 objects");
+check(ROUTE.length === 3, "ROUTE must contain 3 steps");
+check(new Set(ROUTE).size === 3, "ROUTE must not duplicate slugs");
+check(ROUTE.join(",") === APPROVED.join(","), "ROUTE must be gudevichi, peski, dubno in order");
 ROUTE.forEach(function (slug, i) {
   check(find(slug) !== null, "ROUTE step " + (i + 1) + " has no object");
+  check(find(slug).routeStep === i + 1, slug + ": routeStep must be " + (i + 1));
+});
+/* Every kept object must have a verified photo — that is the point of the focus set. */
+CHURCHES.forEach(function (church) {
+  check(!church.placeholder, church.slug + ": focus set must not contain placeholders");
+  check(!!church.photo && !!church.photoCredit, church.slug + ": photo and credit required");
 });
 
-/* Route boundary: ring neighbors and hash parsing. */
+/* Route boundary: neighbors and hash parsing. */
 var first = find(ROUTE[0]);
-var last = find(ROUTE[11]);
+var last = find(ROUTE[2]);
 check(Router.routeNeighbours(first).prev === last, "first previous must wrap to last");
 check(Router.routeNeighbours(last).next === first, "last next must wrap to first");
 check(Router.parseRoute() === "", "empty hash must select home");
@@ -46,26 +55,23 @@ CHURCHES.forEach(function (church) {
   check(links.osm === "https://www.openstreetmap.org/?mlat=" + church.coords.lat + "&mlon=" + church.coords.lon + "&zoom=17", "OSM URL mismatch: " + church.slug);
 });
 
-/* Map model contract: logical route, three approved clusters, 11 singles. */
+/* Map model contract: three distinct settlements — no cluster, 3 singles. */
 var map = window.ChurchMapGeometry.buildSchemaData();
-check(map.points.length === 12, "map must expose 12 route points");
+check(map.points.length === 3, "map must expose 3 route points");
 check(map.points.every(function (point, i) { return point.step === i + 1 && point.slug === ROUTE[i]; }), "map points must follow ROUTE order");
-var clusters = {};
-map.clusters.forEach(function (cluster) { clusters[cluster.name] = cluster.members.map(function (member) { return member.slug; }); });
-check(Object.keys(clusters).length === 1, "map must have exactly one cluster");
-check(clusters["Мосты"] && clusters["Мосты"].length === 3, "Мосты cluster must have 3 members");
-check(map.singles.length === 9, "map must have 9 single markers");
+check(map.clusters.length === 0, "focus set must have no clusters");
+check(map.singles.length === 3, "map must have 3 single markers");
 
 /* Render boundary: page views preserve the essential public states. */
 Views.renderHome();
 check(appEl.innerHTML.indexOf("Схема маршрута") !== -1, "home must render the map region");
-check((appEl.innerHTML.match(/class="route-name"/g) || []).length === 12, "home must render 12 route entries");
+check((appEl.innerHTML.match(/class="route-name"/g) || []).length === 3, "home must render 3 route entries");
 Views.renderChurch(first);
 check(appEl.innerHTML.indexOf("Открыть на Яндекс.Картах") !== -1, "church page must render Yandex link");
 check(appEl.innerHTML.indexOf("OpenStreetMap") !== -1, "church page must render OSM link");
 Views.renderNotFound();
 check(appEl.innerHTML.indexOf("Храм не найден") !== -1, "404 view must render not-found copy");
 
-console.log("contract v2 (orthodox-only) | objects:", CHURCHES.length, "| route:", ROUTE.length, "| clusters:", Object.keys(clusters).length, "| singles:", map.singles.length);
+console.log("contract v3 (focus-trio) | objects:", CHURCHES.length, "| route:", ROUTE.length, "| clusters:", map.clusters.length, "| singles:", map.singles.length);
 console.log("PROBLEMS:", problems.length ? problems : "none");
 process.exit(problems.length ? 1 : 0);
