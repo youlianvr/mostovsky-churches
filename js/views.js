@@ -139,26 +139,30 @@
       '<polyline class="hero-ribbon-line" points="' + flat.join(" ") + '"/>' + dots + '</svg>';
   }
   /* Locator on a church page: the district outline with all three stops, the
-     current one enlarged. Reuses the same projected geometry — no new assets. */
+     current one marked by a larger icon and a label. Sizes are in schema user
+     units (viewBox 1000 × 620), so they stay legible when the SVG shrinks to a
+     phone; the label names the settlement — short enough not to be clipped. */
   function locatorHtml(church) {
     if (!window.ChurchMapGeometry) { return ""; }
     var G = window.ChurchMapGeometry;
     var pts = ROUTE.map(function (slug) {
       var c = R.findChurchBySlug(slug);
       var p = G.project(c.coords.lat, c.coords.lon);
-      return { name: c.shortName, x: p.x, y: p.y, current: c.slug === church.slug };
+      return { settlement: c.settlement, x: p.x, y: p.y, current: c.slug === church.slug };
     });
     var markers = pts.map(function (p) {
-      var size = p.current ? 28 : 18;
+      var width = p.current ? 62 : 44;
+      var height = Math.round(width * 1.15);
+      var halo = p.current ? 36 : 26;
       return '<g class="locator-point' + (p.current ? " is-current" : "") + '" transform="translate(' + p.x.toFixed(1) + ',' + p.y.toFixed(1) + ')">' +
-        '<circle r="' + (p.current ? 20 : 13) + '"/>' +
+        '<circle r="' + halo + '"/>' +
         (window.ChurchIcon ? window.ChurchIcon.svg("church-icon locator-icon",
-          'x="' + (-size / 2) + '" y="' + (-size * 1.05) + '" width="' + size + '" height="' + Math.round(size * 1.15) + '"') : "") +
+          'x="' + (-width / 2) + '" y="' + (-height / 2) + '" width="' + width + '" height="' + height + '"') : "") +
         '</g>';
     }).join("");
     var cur = pts.filter(function (p) { return p.current; })[0];
-    var label = cur ? '<text class="locator-label" x="' + (cur.x + 26).toFixed(1) + '" y="' + (cur.y + 6).toFixed(1) + '">' +
-      escapeHtml(church.shortName) + '</text>' : "";
+    var label = cur ? '<text class="locator-label" x="' + (cur.x + 44).toFixed(1) + '" y="' + (cur.y + 15).toFixed(1) + '">' +
+      escapeHtml(cur.settlement) + '</text>' : "";
     return '<figure class="locator-map"><svg viewBox="0 0 ' + G.W + ' ' + G.H +
       '" aria-hidden="true" focusable="false">' +
       '<path class="locator-district" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
@@ -278,7 +282,7 @@
     app.innerHTML = '<h1>Логистика маршрута</h1>' +
       '<p class="page-lead">Способы передвижения и расстояния до каждой остановки — от Гродно (областной центр) и от Мостов (районный центр).</p>' +
       '<section><h2>Сколько ехать до каждого храма</h2><div class="table-scroll"><table class="data-table"><thead><tr><th>Остановка</th><th>От Гродно</th><th>От Мостов</th><th>Автобус</th><th>Пешком</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
-      '<p class="data-note">Расстояния — по дорожным маршрутам OpenStreetMap, время на автомобиле — оценка без учёта остановок и погоды.</p></section>' +
+      '<p class="data-note">Расстояния — по дорожным маршрутам OpenStreetMap, время на автомобиле — оценка без учёта остановок и погоды. На телефоне таблицу можно прокрутить вбок.</p></section>' +
       '<section><h2>Перегоны между остановками</h2><div class="table-scroll"><table class="data-table"><thead><tr><th>№</th><th>Участок</th><th>Способ</th><th>Расстояние</th><th>Время</th></tr></thead><tbody>' + legs + '</tbody></table></div></section>' +
       '<section class="card"><h2>Способы передвижения</h2>' + modes + '</section>' +
       sectionNavHtml("logistika");
