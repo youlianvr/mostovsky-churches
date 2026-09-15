@@ -1,6 +1,6 @@
-# Verification contract v1
+# Verification contract v2
 
-The project is a no-build vanilla app. The contract checks behavior, not visual polish.
+The project is a no-build vanilla app. The contracts check behavior, not visual polish.
 
 ## Focused contract
 
@@ -8,7 +8,22 @@ The project is a no-build vanilla app. The contract checks behavior, not visual 
 node tests/contract.js
 ```
 
-It covers the 12-object data boundary, unique route order, ring wraparound, hash parsing including `#/map`, unknown slugs, both map URL formats for every object, the Мосты cluster, 9 single markers, and the essential home/church/404 views.
+Covers the 3-object data boundary, the route order (Гудевичи → Лунно → Дубно), the six
+mandatory sections of competition block 1 in the wording of the competition document,
+ring wraparound, hash parsing including `#/map` and `#/logistika`, both map URL formats
+for every object, the shared church icon, the empty cluster list, three single markers,
+and the essential home / opis / logistika / spravka / foto / church / 404 views.
+
+## Content contract
+
+```bash
+node tests/content-completeness.js
+```
+
+Checks every stop for identity, facts, at least two paragraphs of history, three or more
+facts, sources, the appeal line («обоснование привлекательности»), distances from both
+Grodno and Mosty, parish contacts and service times, food note, photo attribution with a
+direct link, and the `visitPhotos` array for the personal photo report.
 
 ## Live browser smoke
 
@@ -18,6 +33,17 @@ Start a static server from the project directory, then run:
 node tests/browser-smoke.js
 ```
 
-The smoke script checks `#/map`, the 12-point line, cluster/single counts, opening the Мосты cluster, navigating to a church page, preserving both map buttons, the unknown-slug page, and browser console errors.
+Needs playwright, which is not vendored in the repository:
 
-The script expects `http://127.0.0.1:8126/index.html`. No test changes application state beyond normal navigation.
+```bash
+npm i --no-save playwright && npx playwright install chromium
+```
+
+The smoke script walks all six sections by URL, checks that the map draws three church
+icons on a three-point route line with no cluster popup, opens a church page from its
+marker, verifies both external map links, checks the logistics table, the parish and
+source lists, the six empty photo-report slots, the unknown-slug page, and browser
+console errors.
+
+The script expects `http://127.0.0.1:8126/index.html`. No test changes application state
+beyond normal navigation.
