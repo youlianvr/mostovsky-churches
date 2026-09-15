@@ -369,7 +369,8 @@
   function renderNotFound() {
     var app = resolveApp();
     if (!app) { return; }
-    app.innerHTML = '<h1>Храм не найден</h1><p>Такой страницы нет. Возможно, ссылка устарела.</p><p><a class="btn" href="#/">Вернуться к маршруту</a></p>';
+    document.title = "Страница не найдена — Храмы Мостовского района";
+    app.innerHTML = '<h1>Храм не найден</h1><p>Такой страницы нет. Возможно, ссылка устарела.</p><p><a class="btn" href="#/">Вернуться к маршруту</a> <a class="btn btn-ghost" href="#/opis">Описание маршрута</a></p>';
   }
 
   window.ChurchViews = {
