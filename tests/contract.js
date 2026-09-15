@@ -20,12 +20,13 @@ var Views = window.ChurchViews;
 function find(slug) { return Router.findChurchBySlug(slug); }
 
 /* Data boundary: the approved focus set is exactly 3 objects
- * (owner decision 2026-09-14: Гудевичи, Пески, Дубно). */
-var APPROVED = ["gudevichi-rozhdestva", "peski-nikolaya", "dubno-nikolaya"];
+ * (owner decision 2026-09-15: Гудевичи, Лунно, Дубно — the trio of the
+ * competition block 1 «Дорогами духовности»). */
+var APPROVED = ["gudevichi-rozhdestva", "lunno-predtechi", "dubno-nikolaya"];
 check(CHURCHES.length === 3, "CHURCHES must contain 3 objects");
 check(ROUTE.length === 3, "ROUTE must contain 3 steps");
 check(new Set(ROUTE).size === 3, "ROUTE must not duplicate slugs");
-check(ROUTE.join(",") === APPROVED.join(","), "ROUTE must be gudevichi, peski, dubno in order");
+check(ROUTE.join(",") === APPROVED.join(","), "ROUTE must be gudevichi, lunno, dubno in order");
 ROUTE.forEach(function (slug, i) {
   check(find(slug) !== null, "ROUTE step " + (i + 1) + " has no object");
   check(find(slug).routeStep === i + 1, slug + ": routeStep must be " + (i + 1));
@@ -56,6 +57,16 @@ CHURCHES.forEach(function (church) {
 });
 
 /* Map model contract: three distinct settlements — no cluster, 3 singles. */
+/* Logistics contract: every route object is reachable from both the
+ * district centre and the regional centre. */
+CHURCHES.forEach(function (church) {
+  check(!!church.logistics, church.slug + ": logistics required");
+  check(!!(church.logistics && church.logistics.fromGrodno && church.logistics.fromGrodno.road), church.slug + ": distance from Grodno required");
+  check(!!(church.logistics && church.logistics.fromMosty && church.logistics.fromMosty.road), church.slug + ": distance from Mosty required");
+});
+check(Array.isArray(ROUTE_LEGS) && ROUTE_LEGS.length >= 3, "ROUTE_LEGS must describe the itinerary");
+check(!!(FOOD && FOOD.places && FOOD.places.length), "FOOD must list places to eat");
+
 var map = window.ChurchMapGeometry.buildSchemaData();
 check(map.points.length === 3, "map must expose 3 route points");
 check(map.points.every(function (point, i) { return point.step === i + 1 && point.slug === ROUTE[i]; }), "map points must follow ROUTE order");
@@ -72,6 +83,6 @@ check(appEl.innerHTML.indexOf("OpenStreetMap") !== -1, "church page must render 
 Views.renderNotFound();
 check(appEl.innerHTML.indexOf("Храм не найден") !== -1, "404 view must render not-found copy");
 
-console.log("contract v3 (focus-trio) | objects:", CHURCHES.length, "| route:", ROUTE.length, "| clusters:", map.clusters.length, "| singles:", map.singles.length);
+console.log("contract v4 (block1-trio) | objects:", CHURCHES.length, "| route:", ROUTE.length, "| clusters:", map.clusters.length, "| singles:", map.singles.length);
 console.log("PROBLEMS:", problems.length ? problems : "none");
 process.exit(problems.length ? 1 : 0);

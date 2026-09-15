@@ -18,6 +18,12 @@ CHURCHES.forEach(function (church) {
   check(Array.isArray(church.history) && church.history.length >= 2 && church.history.every(text), prefix + "history must contain at least two paragraphs");
   check(Array.isArray(church.facts) && church.facts.length >= 3 && church.facts.every(text), prefix + "facts list incomplete");
   check(Array.isArray(church.sources) && church.sources.length > 0 && church.sources.every(text), prefix + "sources incomplete");
+  /* «Справочная информация» и «Логистика» — обязательные элементы Блока 1. */
+  check(text(church.rector), prefix + "rector required");
+  check(text(church.phone) && /^[+\d][\d\s\-()]{6,}$/.test(church.phone), prefix + "phone must look like a real number");
+  check(text(church.services), prefix + "service schedule required");
+  check(text(church.gettingThere), prefix + "getting-there text required");
+  check(text(church.food), prefix + "food note required");
   check(!church.placeholder, prefix + "focus trio must not contain placeholders");
   if (church.photo) { check(/^img\/photos\/[^/]+\.(jpg|jpeg|png|webp)$/i.test(church.photo), prefix + "photo path must be local and safe"); }
   if (church.needsLicenseReview) {
@@ -32,5 +38,5 @@ var shortNames = CHURCHES.map(function (church) { return church.shortName || "";
 check(shortNames.every(text), "every church needs a shortName for prev/next navigation");
 check(new Set(shortNames).size === CHURCHES.length, "shortName values must be unique for distinct prev/next labels");
 var approx = CHURCHES.filter(function (church) { return church.coordsNote; });
-console.log("content contract v2 (focus-trio) | objects:", CHURCHES.length, "| approx:", approx.length, "| placeholders:", CHURCHES.filter(function (c) { return c.placeholder; }).length, "| PROBLEMS:", problems.length ? problems : "none");
+console.log("content contract v3 (block1-trio) | objects:", CHURCHES.length, "| approx:", approx.length, "| placeholders:", CHURCHES.filter(function (c) { return c.placeholder; }).length, "| PROBLEMS:", problems.length ? problems : "none");
 process.exit(problems.length ? 1 : 0);
