@@ -1,9 +1,19 @@
 /* ============================================================
- * Храмы Мостовского района — единые стили (этап 3: фундамент)
+ * Храмы Мостовского района — единые стили
  *
  * Дизайн-токены (спецификация §9): краеведческий стиль —
  * пергаментный фон, тёмно-зелёный + охра, серифная типографика.
  * ЕДИНСТВЕННЫЙ источник стиля: инлайн-стили в HTML запрещены.
+ *
+ * Сайт = Блок 1 «Дорогами духовности». Каждый обязательный элемент
+ * блока — отдел со своим набором правил:
+ *   нитка маршрута   — .route-list, .data-table
+ *   карта-схема      — .map-schema, .church-icon, .map-marker-*
+ *   описание         — .stop-cards, .stop-appeal
+ *   логистика        — .data-table
+ *   справочная инфо  — .stop-cards, .source-checks
+ *   фотоотчёт        — .report-grid, .report-slot
+ * Единый условный знак — иконка церкви (.church-icon, см. js/church-icon.js).
  * ============================================================ */
 
 /* ---------- Токены ---------- */
@@ -23,6 +33,7 @@
   /* типографика */
   --font-serif: Georgia, "Times New Roman", "Liberation Serif", serif;
   --font-body: Georgia, "Times New Roman", "Liberation Serif", serif;
+  --font-mono: Consolas, "Courier New", monospace;
   --fs-hero: clamp(1.9rem, 4.5vw, 3rem);   /* заголовок главной */
   --fs-h1: clamp(1.6rem, 3vw, 2.4rem);     /* заголовок раздела */
   --fs-h2: clamp(1.25rem, 2vw, 1.6rem);    /* заголовок блока */
@@ -39,9 +50,6 @@
   --container-max: 1100px;
   --content-gutter: clamp(1rem, 3vw, 2rem);
   --line-height-body: 1.65;
-
-  /* иконография конфессий (этап 5, SVG) */
-  --marker-orthodox: circle;
 }
 
 /* ---------- База ---------- */
@@ -64,6 +72,14 @@ img { max-width: 100%; height: auto; }
   max-width: var(--container-max);
   margin: 0 auto;
   padding: 0 var(--content-gutter);
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: var(--color-bg-soft);
+  padding: 0 0.25em;
+  border-radius: 3px;
 }
 
 /* Заголовки — серифные, крупный кегль (читаемость с проектора) */
@@ -169,7 +185,7 @@ a:hover { color: var(--color-ochre-deep); }
   padding: var(--space-md);
 }
 
-/* Список маршрута (главная) */
+/* Список остановок: нитка маршрута, объекты на схеме */
 .route-list {
   list-style: none;
   margin: 0;
@@ -204,6 +220,21 @@ a:hover { color: var(--color-ochre-deep); }
   line-height: 1;
   min-width: 2rem;
 }
+
+/* ---------- Условный знак «православный храм» ---------- */
+.church-icon .ci-body { fill: var(--color-ochre); }
+.church-icon .ci-roof { fill: var(--color-ochre-deep); }
+.church-icon .ci-dome { fill: var(--color-green); }
+.church-icon .ci-cross { fill: var(--color-green-deep); }
+
+/* Иконка в списках и заголовках: размер задаёт текст, не схема */
+.stop-icon {
+  width: 1.6rem;
+  height: auto;
+  flex: 0 0 auto;
+  vertical-align: -0.35em;
+}
+.church-subtitle .stop-icon { width: 1.9rem; }
 
 /* ---------- Кнопки ---------- */
 .btn {
@@ -343,11 +374,7 @@ a:hover { color: var(--color-ochre-deep); }
   font-style: italic;
   margin-top: var(--space-sm);
 }
-.transport-hint {
-  margin: 0 0 var(--space-md);
-  color: var(--color-muted);
-}
-.transport-hint strong { color: var(--color-green-deep); }
+.visit-links { font-size: var(--fs-small); }
 
 /* Локатор на странице храма: район + отметка текущей остановки */
 .church-eyebrow {
@@ -377,13 +404,12 @@ a:hover { color: var(--color-ochre-deep); }
   stroke-width: 7;
   stroke-linecap: round;
 }
-.locator-map .locator-point {
-  fill: var(--color-ochre);
-  stroke: var(--color-card);
-  stroke-width: 2;
+.locator-map .locator-point circle {
+  fill: var(--color-card);
+  stroke: var(--color-ochre);
+  stroke-width: 1.5;
 }
-.locator-map .locator-point.is-current {
-  fill: var(--color-green);
+.locator-map .locator-point.is-current circle {
   stroke: var(--color-ochre-deep);
   stroke-width: 2.5;
 }
@@ -453,14 +479,6 @@ a:hover { color: var(--color-ochre-deep); }
 }
 .hero p { max-width: 60ch; }
 
-.map-placeholder-note {
-  text-align: center;
-  color: var(--color-muted);
-  font-style: italic;
-  padding: var(--space-md);
-  margin: 0;
-}
-
 .route-name {
   font-family: var(--font-serif);
   font-weight: bold;
@@ -484,6 +502,16 @@ a:hover { color: var(--color-ochre-deep); }
   gap: var(--space-sm);
   color: var(--color-muted);
   margin-bottom: var(--space-md);
+}
+
+/* Обоснование привлекательности объекта — требование отдела «Описание» */
+.church-lead {
+  max-width: 70ch;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg-soft);
+  border-left: 4px solid var(--color-ochre);
+  border-radius: var(--radius);
+  color: var(--color-green-deep);
 }
 
 .fact-panel {
@@ -518,35 +546,148 @@ a:hover { color: var(--color-ochre-deep); }
   padding-top: var(--space-md);
 }
 
-/* ---------- Схема (этап 5) ---------- */
+/* ---------- Общие детали отделов Блока 1 ---------- */
+.page-lead {
+  max-width: 68ch;
+  color: var(--color-muted);
+}
+
+.data-note {
+  max-width: 80ch;
+  color: var(--color-muted);
+  font-size: var(--fs-small);
+  font-style: italic;
+}
+
+.table-scroll { overflow-x: auto; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-card);
+  font-size: var(--fs-small);
+}
+.data-table th,
+.data-table td {
+  border: 1px solid var(--color-line);
+  padding: var(--space-xs) var(--space-sm);
+  text-align: left;
+  vertical-align: top;
+}
+.data-table thead th {
+  background: var(--color-green);
+  color: #fff;
+  font-family: var(--font-serif);
+}
+.cell-note { color: var(--color-muted); }
+
+/* Переходы между отделами внизу страницы */
+.section-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-line);
+}
+
+/* Отдел «Описание»: карточки остановок */
+.stop-cards {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.stop-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.stop-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+.stop-head h3 { margin: 0; }
+.stop-meta {
+  flex: 1 1 100%;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--fs-small);
+}
+.stop-appeal {
+  padding-left: var(--space-sm);
+  border-left: 3px solid var(--color-ochre);
+  color: var(--color-green-deep);
+}
+.stop-card .facts-list { margin-top: 0; }
+
+/* Отдел «Справочная информация»: чек-лист источников */
+.source-checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-xs);
+}
+.source-check {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: baseline;
+}
+.source-check.is-done { color: var(--color-muted); }
+.check-mark {
+  color: var(--color-ochre-deep);
+  font-weight: bold;
+}
+
+/* Отдел «Фотоотчёт»: слоты под личные фотографии */
+.report-grid {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.report-slot {
+  margin: 0;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: var(--color-card);
+  overflow: hidden;
+}
+.report-slot img { display: block; width: 100%; }
+.report-slot-frame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-height: 180px;
+  background: var(--color-bg-soft);
+  border-bottom: 1px dashed var(--color-line);
+  color: var(--color-muted);
+}
+.slot-plus {
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--color-ochre-deep);
+}
+.slot-caption { font-size: var(--fs-small); font-style: italic; }
+.report-slot figcaption {
+  padding: var(--space-sm);
+  font-size: var(--fs-small);
+  color: var(--color-muted);
+}
+.slot-meta { font-style: italic; }
+
+/* ---------- Схема (SVG) ---------- */
 .map-schema {
+  overflow-x: auto;
   background: var(--color-card);
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
   padding: var(--space-sm);
-}
-
-.legend {
-  display: flex;
-  gap: var(--space-md);
-  justify-content: center;
-  font-size: var(--fs-small);
-  margin-top: var(--space-sm);
-}
-.legend-item { display: inline-flex; align-items: center; gap: var(--space-xs); }
-.marker-sample {
-  width: 0.8rem;
-  height: 0.8rem;
-  display: inline-block;
-  background: var(--color-ochre);
-}
-.marker-sample.orthodox { border-radius: 50%; }
-
-/* ---------- SVG-схема (этап 5) ---------- */
-.map-schema {
-  overflow-x: auto;
-  scrollbar-color: var(--color-ochre) var(--color-bg-soft);              /* на мобильных схема скроллится по горизонтали,
-                                    метки сохраняют читаемый размер (этап 7 — полировка) */
+  scrollbar-color: var(--color-ochre) var(--color-bg-soft);   /* на мобильных схема скроллится по горизонтали,
+                                     метки сохраняют читаемый размер (этап 7 — полировка) */
 }
 .map-schema svg {
   display: block;
@@ -555,8 +696,7 @@ a:hover { color: var(--color-ochre-deep); }
   height: auto;
   pointer-events: none;
 }
-.map-schema svg .map-marker-g,
-.map-schema svg .map-cluster { pointer-events: bounding-box; }
+.map-schema svg .map-marker-g { pointer-events: bounding-box; }
 
 .map-background {
   pointer-events: none;
@@ -612,29 +752,20 @@ a:hover { color: var(--color-ochre-deep); }
   stroke-linecap: round;
 }
 
-/* Метки: круг = православный храм */
-.map-marker {
-  fill: var(--color-ochre);
+/* Метка остановки: иконка церкви на подложке, номер шага — бейджем */
+.map-marker-halo {
+  fill: var(--color-card);
+  stroke: var(--color-ochre);
+  stroke-width: 1.5;
+  opacity: 0.94;
+}
+.map-marker-icon { pointer-events: none; }
+.map-marker-badge {
+  fill: var(--color-green);
   stroke: var(--color-card);
   stroke-width: 2;
 }
-.map-marker.orthodox {
-  fill: var(--color-green);
-}
-.map-marker-g { cursor: pointer; pointer-events: bounding-box; }
-.map-cluster { cursor: pointer; pointer-events: bounding-box; }
-.map-cluster .map-marker {
-  stroke-width: 2.5;
-}
-/* Cluster halo: distinct "several temples here" code, readable at projector distance */
-.map-cluster-halo {
-  fill: var(--color-card);
-  stroke: var(--color-green-deep);
-  stroke-width: 1.5;
-}
-.map-cluster .map-marker-label {
-  font-weight: bold;
-}
+.map-marker-g { cursor: pointer; }
 
 .map-marker-num {
   fill: #fff;
@@ -659,17 +790,32 @@ a:hover { color: var(--color-ochre-deep); }
   user-select: none;
 }
 
-.map-marker-g:hover .map-marker,
-.map-marker-g:focus .map-marker,
-.map-cluster:hover .map-marker,
-.map-cluster:focus .map-marker,
-.map-marker-g.is-highlighted .map-marker {
+.map-marker-g:hover .map-marker-halo,
+.map-marker-g:focus .map-marker-halo,
+.map-marker-g.is-highlighted .map-marker-halo {
   stroke: var(--color-ochre-deep);
-  stroke-width: 3;
+  stroke-width: 2.5;
 }
-.map-cluster:hover .map-cluster-halo,
-.map-cluster:focus .map-cluster-halo {
-  stroke: var(--color-ochre-deep);
+.map-marker-g:hover .map-marker-badge,
+.map-marker-g.is-highlighted .map-marker-badge {
+  fill: var(--color-ochre-deep);
+}
+
+/* Легенда схемы */
+.legend {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+  font-size: var(--fs-small);
+  margin-top: var(--space-sm);
+}
+.legend-item { display: inline-flex; align-items: center; gap: var(--space-xs); }
+.legend-icon { width: 1.6rem; height: auto; }
+.legend-route {
+  display: inline-block;
+  width: 2rem;
+  border-top: 3px dashed var(--color-ochre-deep);
 }
 
 /* Horizontal scroll affordance for the map on mobile (DG-Map) */
@@ -702,72 +848,6 @@ a:hover { color: var(--color-ochre-deep); }
 .map-schema.is-scrollable.is-at-end {
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--map-fade), #000 100%);
   mask-image: linear-gradient(to right, transparent 0, #000 var(--map-fade), #000 100%);
-}
-
-/* Попап выбора храмов в кластере (DG4) */
-.cluster-popup {
-  margin-top: var(--space-md);
-  position: relative;
-  padding: var(--space-md);
-  background: var(--color-card);
-  border: 1px solid var(--color-line);
-  box-shadow: 0 6px 18px rgba(43, 36, 26, 0.18);
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-.cluster-popup.is-open {
-  opacity: 1;
-  transform: translateY(0);
-}
-@media (prefers-reduced-motion: reduce) {
-  .cluster-popup { transition: none; transform: none; }
-  border-radius: var(--radius);
-}
-.cluster-popup[hidden] { display: none; }
-
-.cluster-popup-title { margin-bottom: var(--space-sm); }
-
-.cluster-popup-close {
-  float: right;
-  min-width: 2.25rem;
-  min-height: 2.25rem;
-  border: none;
-  background: transparent;
-  font-size: 1.4rem;
-  line-height: 1;
-  cursor: pointer;
-  color: var(--color-muted);
-}
-.cluster-popup-close:hover { color: var(--color-ink); }
-
-.cluster-popup-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-xs);
-}
-.cluster-popup-list a {
-  text-decoration: none;
-  font-family: var(--font-serif);
-  font-weight: bold;
-  color: var(--color-green-deep);
-}
-.cluster-popup-list a:hover { color: var(--color-ochre-deep); }
-
-.cluster-step {
-  display: inline-block;
-  min-width: 1.6rem;
-  color: var(--color-ochre-deep);
-  font-weight: bold;
-  font-style: italic;
-}
-
-.cluster-conf {
-  color: var(--color-muted);
-  font-size: var(--fs-small);
-  margin-left: var(--space-xs);
 }
 
 /* ---------- Доступность ---------- */
@@ -819,7 +899,7 @@ a:hover { color: var(--color-ochre-deep); }
   .map-schema { margin-left: calc(-1 * var(--content-gutter)); margin-right: calc(-1 * var(--content-gutter)); border-left: 0; border-right: 0; border-radius: 0; }
 
   /* Effective sizes on mobile: the SVG scales down, so user units grow
-     to keep labels and the route line readable (Stage 2) */
+     to keep icons, labels and the route line readable (Stage 2) */
   .map-marker-label { font-size: 19px; stroke-width: 5; }
   .map-marker-num { font-size: 17px; }
   .map-water-label { font-size: 17px; }
