@@ -152,10 +152,33 @@ ROUTE.forEach(function (slug) {
   var church = find(slug);
   check(appEl.innerHTML.indexOf(church.logistics.fromGrodno.road) !== -1 &&
     appEl.innerHTML.indexOf(church.logistics.fromMosty.road) !== -1, slug + ": both distances must be shown");
-  check(appEl.innerHTML.indexOf(H.escape(church.logistics.bus)) !== -1, slug + ": the bus line must be shown");
+
 });
-check(appEl.innerHTML.indexOf(H.escape(BUS.address)) !== -1 && appEl.innerHTML.indexOf(H.escape(BUS.phone)) !== -1,
-  "logistics must give the bus station address and ticket office phone");
+[BUS.mosty, BUS.grodno].forEach(function (hub) {
+  check(appEl.innerHTML.indexOf(H.escape(hub.name)) !== -1 &&
+    appEl.innerHTML.indexOf(H.escape(hub.address)) !== -1 &&
+    appEl.innerHTML.indexOf(H.escape(hub.phone)) !== -1,
+    "logistics must give the address and phone of " + hub.name);
+});
+/* Автобусы у остановок: у каждого храма — своя остановка с рейсами, а не
+ * отговорка «до Дубно прямого рейса нет». */
+check(BUS_STOPS.length === ROUTE.length, "every stop of the route must carry its own bus timetable");
+BUS_STOPS.forEach(function (entry) {
+  var church = find(entry.slug);
+  check(entry.trips.length >= 2, entry.slug + ": a stop needs trips in both directions");
+  check(appEl.innerHTML.indexOf(H.escape(church.settlement) + " — " + H.escape(entry.stop)) !== -1,
+    entry.slug + ": the bus stop must be named on the page");
+  entry.trips.forEach(function (trip) {
+    check(appEl.innerHTML.indexOf(H.escape(trip.routes)) !== -1 && appEl.innerHTML.indexOf(H.escape(trip.times)) !== -1,
+      entry.slug + ": route numbers and times must reach the page — " + trip.to);
+  });
+  check(appEl.innerHTML.indexOf(H.escape(entry.toChurch)) !== -1,
+    entry.slug + ": the walk from the stop to the church must be stated");
+});
+check(appEl.innerHTML.indexOf("Автобусы у остановок маршрута") !== -1,
+  "logistics must carry a bus timetable section");
+check(BUS.checked && appEl.innerHTML.indexOf(H.escape(BUS.checked)) !== -1,
+  "the bus data must state the date it was checked");
 
 /* --- reference: parish contacts and places to eat --- */
 section("spravka").render();
@@ -208,9 +231,16 @@ function dataError(source) {
     return null;
   } catch (error) { return error; }
 }
-var swapped = dataSource.replace(
-  '  "gudevichi-rozhdestva", // 1 Гудевичи\n  "lunno-predtechi",      // 2 Лунно',
-  '  "lunno-predtechi",      // 1 Лунно\n  "gudevichi-rozhdestva", // 2 Гудевичи');
+/* Порядок ROUTE меняем внутри самого массива: своп не должен задеть слаги
+ * объектов, иначе проверка «диагност называет объект по слагу» теряет смысл. */
+var Q = String.fromCharCode(34);
+var routeBlock = dataSource.slice(dataSource.indexOf("var ROUTE = ["));
+routeBlock = routeBlock.slice(0, routeBlock.indexOf("];") + 2);
+var swappedBlock = routeBlock
+  .replace(Q + "gudevichi-rozhdestva" + Q, Q + "__swap__" + Q)
+  .replace(Q + "lunno-predtechi" + Q, Q + "gudevichi-rozhdestva" + Q)
+  .replace(Q + "__swap__" + Q, Q + "lunno-predtechi" + Q);
+var swapped = dataSource.replace(routeBlock, swappedBlock);
 check(swapped !== dataSource, "contract must be able to swap ROUTE order");
 var error = dataError(swapped);
 check(error && error.message.indexOf("lunno-predtechi") !== -1,
