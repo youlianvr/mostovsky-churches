@@ -1,4 +1,6 @@
-/* Map domain model: projection, illustrative geography, grouping, label placement. */
+/* Map domain model: projection, illustrative geography, marker label placement.
+ * Кластеризация убрана: в маршруте Блока 1 три объекта в трёх разных
+ * деревнях, поэтому каждая остановка — отдельная иконка церкви. */
 (function () {
   "use strict";
 
@@ -47,7 +49,7 @@
   }
 
   function buildSchemaData() {
-    var points = [], bySettlement = {}, i, c, p, key, members, m, cx, cy;
+    var points = [], i, c, p;
     for (i = 0; i < ROUTE.length; i++) {
       c = findChurch(ROUTE[i]);
       p = project(c.coords.lat, c.coords.lon);
@@ -55,23 +57,9 @@
         shortName: normSettlement(c.settlement), confession: c.confession,
         step: i + 1, x: p.x, y: p.y });
     }
-    for (i = 0; i < points.length; i++) {
-      key = points[i].shortName;
-      if (!bySettlement[key]) { bySettlement[key] = []; }
-      bySettlement[key].push(points[i]);
-    }
-    var clusters = [], singles = [];
-    for (key in bySettlement) {
-      members = bySettlement[key];
-      if (members.length > 1) {
-        cx = 0; cy = 0;
-        for (m = 0; m < members.length; m++) { cx += members[m].x; cy += members[m].y; }
-        clusters.push({ name: key, members: members, x: cx / members.length, y: cy / members.length });
-      } else { singles.push(members[0]); }
-    }
-    clusters.sort(function (a, b) { return a.members[0].step - b.members[0].step; });
-    singles.sort(function (a, b) { return a.step - b.step; });
-    return { points: points, clusters: clusters, singles: singles };
+    /* clusters остаётся пустым списком: если маршрут когда-нибудь получит
+     * две остановки в одном населённом пункте, модель к этому готова. */
+    return { points: points, clusters: [], singles: points.slice() };
   }
 
   function pointString(lat, lon) {
@@ -95,15 +83,15 @@
       labels.forEach(function (t) {
         var mx = parseFloat(t.getAttribute("data-mx"));
         var my = parseFloat(t.getAttribute("data-my"));
-        t.setAttribute("x", t.__side === "right" ? mx : mx - 36);
+        t.setAttribute("x", t.__side === "right" ? mx : mx - 44);
         t.setAttribute("y", my + t.__dy);
         t.setAttribute("text-anchor", t.__side === "right" ? "start" : "end");
         var b = t.getBBox();
         arr.push({ type: "label", el: t, my: my, x: b.x, y: b.y, w: b.width, h: b.height });
       });
-      Array.prototype.slice.call(svg.querySelectorAll(".map-marker")).forEach(function (circle) {
-        var b = circle.getBBox();
-        arr.push({ type: "circle", x: b.x, y: b.y, w: b.width, h: b.height });
+      Array.prototype.slice.call(svg.querySelectorAll(".map-marker-icon")).forEach(function (icon) {
+        var b = icon.getBBox();
+        arr.push({ type: "icon", x: b.x, y: b.y, w: b.width, h: b.height });
       });
       return arr;
     }
