@@ -280,6 +280,17 @@ a:hover { color: var(--color-ochre-deep); }
 }
 .fact-panel dd { margin: 0 0 var(--space-xs); overflow-wrap: anywhere; }
 
+/* Отдел «Логистика»: рейсы у остановки — списком, а не таблицей.
+ * Три колонки с длинными строками на телефоне превращались в простыню. */
+.bus-trips { margin: 0; }
+.bus-trips dt {
+  margin-top: var(--space-sm);
+  font-weight: bold;
+  color: var(--color-green-deep);
+}
+.bus-trips dt:first-child { margin-top: 0; }
+.bus-trips dd { margin: 0; overflow-wrap: anywhere; }
+
 /* ---------- Фото и подпись ---------- */
 .church-photo {
   border: 1px solid var(--color-line);
