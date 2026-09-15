@@ -924,3 +924,19 @@ a:hover { color: var(--color-ochre-deep); }
   .route-nav { flex-direction: column; }
   .route-nav .btn { max-width: none; }
 }
+
+/* Печать: жюри часто смотрит проект на бумаге, поэтому интерфейс убирается,
+   а содержимое (нитка, карта, описание, логистика, справка, фотоотчёт) остаётся. */
+@media print {
+  body { background: #fff; color: #000; }
+  .site-header, .site-footer, .section-nav, .map-buttons, .hero-guide,
+  .visit-links, .map-scroll-hint, .crumbs { display: none; }
+  .container { max-width: none; padding: 0; }
+  a { color: #000; text-decoration: none; }
+  h1, h2, h3 { break-after: avoid; }
+  .card, .stop-card, .report-slot, .church-photo, .locator-map,
+  .table-scroll, .facts-list li { break-inside: avoid; }
+  .map-schema { overflow: visible; border: 0; margin: 0; }
+  .map-schema svg { width: 100%; height: auto; }
+  .report-slot-frame { border-style: solid; }
+}

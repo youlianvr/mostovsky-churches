@@ -6,7 +6,7 @@
   <title>Дорогами духовности — маршрут по храмам Мостовского района</title>
   <meta name="description" content="Блок 1 «Дорогами духовности»: маршрут по трём православным храмам Мостовского района — Гудевичи, Лунно и Дубно. Нитка маршрута, карта-схема, описание, логистика, справочная информация и фотоотчёт.">
   <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
-  <link rel="stylesheet" href="css/style.css?v=24">
+  <link rel="stylesheet" href="css/style.css?v=25">
 </head>
 <body>
   <header class="site-header">
@@ -37,12 +37,16 @@
 
   <noscript><p class="container">Для просмотра маршрута включите JavaScript.</p></noscript>
 
-  <script src="js/data.js?v=4"></script>
+  <!-- Порядок загрузки = порядок зависимости модулей: данные и адрес → схема
+       и её рисунок → разметка → шесть отделов → страница храма → диспетчер. -->
+  <script src="js/data.js?v=7"></script>
   <script src="js/router.js"></script>
   <script src="js/map-geometry.js"></script>
   <script src="js/church-icon.js?v=1"></script>
-  <script src="js/map.js?v=12"></script>
-  <script src="js/views.js?v=24"></script>
-  <script src="js/app.js?v=3"></script>
+  <script src="js/dom.js?v=2"></script>
+  <script src="js/map.js?v=13"></script>
+  <script src="js/sections.js?v=2"></script>
+  <script src="js/church.js?v=3"></script>
+  <script src="js/app.js?v=5"></script>
 </body>
 </html>

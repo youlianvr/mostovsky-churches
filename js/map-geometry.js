@@ -1,6 +1,8 @@
-/* Map domain model: projection, illustrative geography, marker label placement.
- * Кластеризация убрана: в маршруте Блока 1 три объекта в трёх разных
- * деревнях, поэтому каждая остановка — отдельная иконка церкви. */
+/* Модель схемы: проекция координат и условная география района.
+ * Модуль чистый: на вход получает упорядоченный список объектов, на выходе —
+ * точки схемы. Ничего не ищет сам (поиск по slug — задача роутера) и ничего
+ * не рисует (отрисовка — js/map.js). Кластеризация не нужна: три остановки
+ * стоят в трёх разных деревнях, поэтому каждая — отдельная иконка. */
 (function () {
   "use strict";
 
@@ -28,14 +30,6 @@
     [24.78, 53.42, 66, 36], [24.44, 53.36, 48, 26], [24.86, 53.30, 44, 24]
   ];
 
-  function findChurch(slug) {
-    var i;
-    for (i = 0; i < CHURCHES.length; i++) {
-      if (CHURCHES[i].slug === slug) { return CHURCHES[i]; }
-    }
-    return null;
-  }
-
   function project(lat, lon) {
     return {
       x: (lon - LON_MIN) / (LON_MAX - LON_MIN) * W,
@@ -43,23 +37,27 @@
     };
   }
 
-  function normSettlement(value) {
-    return String(value).replace(/^(д\.|аг\.|пос\.|г\.)\s*/i, "")
+  /* «д. Гудевичи» → «Гудевичи»: на схеме нужна короткая подпись. */
+  function shortLabel(settlement) {
+    return String(settlement).replace(/^(д\.|аг\.|пос\.|г\.)\s*/i, "")
       .replace(/\s*\(.*\)$/, "").trim();
   }
 
-  function buildSchemaData() {
-    var points = [], i, c, p;
-    for (i = 0; i < ROUTE.length; i++) {
-      c = findChurch(ROUTE[i]);
-      p = project(c.coords.lat, c.coords.lon);
-      points.push({ slug: c.slug, name: c.name, settlement: c.settlement,
-        shortName: normSettlement(c.settlement), confession: c.confession,
-        step: i + 1, x: p.x, y: p.y });
-    }
-    /* clusters остаётся пустым списком: если маршрут когда-нибудь получит
-     * две остановки в одном населённом пункте, модель к этому готова. */
-    return { points: points, clusters: [], singles: points.slice() };
+  /* Упорядоченный список объектов маршрута → точки схемы.
+   * step = номер остановки в нитке маршрута. */
+  function routePoints(orderedChurches) {
+    return orderedChurches.map(function (church, index) {
+      var p = project(church.coords.lat, church.coords.lon);
+      return {
+        slug: church.slug,
+        name: church.name,
+        settlement: church.settlement,
+        label: shortLabel(church.settlement),
+        step: index + 1,
+        x: p.x,
+        y: p.y
+      };
+    });
   }
 
   function pointString(lat, lon) {
@@ -73,63 +71,8 @@
     return d + (close ? " Z" : "");
   }
 
-  function resolveLabelCollisions(svg) {
-    var labels = Array.prototype.slice.call(svg.querySelectorAll(".map-marker-label"));
-    var pass, i, j, changed;
-    labels.forEach(function (t) { t.__side = "right"; t.__dy = 0; t.__flipped = false; });
-
-    function boxes() {
-      var arr = [];
-      labels.forEach(function (t) {
-        var mx = parseFloat(t.getAttribute("data-mx"));
-        var my = parseFloat(t.getAttribute("data-my"));
-        t.setAttribute("x", t.__side === "right" ? mx : mx - 44);
-        t.setAttribute("y", my + t.__dy);
-        t.setAttribute("text-anchor", t.__side === "right" ? "start" : "end");
-        var b = t.getBBox();
-        arr.push({ type: "label", el: t, my: my, x: b.x, y: b.y, w: b.width, h: b.height });
-      });
-      Array.prototype.slice.call(svg.querySelectorAll(".map-marker-icon")).forEach(function (icon) {
-        var b = icon.getBBox();
-        arr.push({ type: "icon", x: b.x, y: b.y, w: b.width, h: b.height });
-      });
-      return arr;
-    }
-    function hit(a, b) {
-      return Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > 2 &&
-        Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > 2;
-    }
-    function flip(t) { t.__side = t.__side === "right" ? "left" : "right"; t.__flipped = true; }
-
-    for (pass = 0; pass < 8; pass++) {
-      changed = false;
-      var all = boxes();
-      for (i = 0; i < all.length; i++) {
-        for (j = i + 1; j < all.length; j++) {
-          var a = all[i], b = all[j];
-          if (!hit(a, b)) { continue; }
-          if (a.type === "label" && b.type === "label") {
-            var upper = a.my <= b.my ? a : b;
-            var lower = upper === a ? b : a;
-            if (upper.el.__dy > -42) { upper.el.__dy -= 14; changed = true; }
-            else if (lower.el.__dy < 42) { lower.el.__dy += 14; changed = true; }
-            else if (!upper.el.__flipped) { flip(upper.el); changed = true; }
-          } else {
-            var label = a.type === "label" ? a.el : b.el;
-            if (label && !label.__flipped) { flip(label); changed = true; }
-          }
-        }
-      }
-      if (!changed) { break; }
-    }
-    labels.forEach(function (t) { delete t.__flipped; });
-  }
-
-  window.ChurchMap = window.ChurchMap || {};
   window.ChurchMapGeometry = {
     W: W, H: H, DISTRICT: DISTRICT, RIVER: RIVER, ROADS: ROADS, FORESTS: FORESTS,
-    findChurch: findChurch, project: project, buildSchemaData: buildSchemaData,
-    pointString: pointString, pathString: pathString, resolveLabelCollisions: resolveLabelCollisions
+    project: project, routePoints: routePoints, pointString: pointString, pathString: pathString
   };
-  window.ChurchMap.buildSchemaData = buildSchemaData;
 })();
