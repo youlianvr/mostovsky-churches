@@ -58,6 +58,17 @@
     return '<dl class="fact-panel"><dt>Населённый пункт</dt><dd>' + escapeHtml(church.settlement) + '</dd>' + year + '<dt>Конфессия</dt><dd>' + confession + '</dd>' +
       (church.status ? '<dt>Статус</dt><dd>' + escapeHtml(church.status) + '</dd>' : '') + (church.address ? '<dt>Адрес</dt><dd>' + escapeHtml(church.address) + '</dd>' : '') + '</dl>';
   }
+  /* Visiting info: how to get there + service times + parish contacts. */
+  function visitHtml(church) {
+    if (!church.gettingThere && !church.services) { return ""; }
+    var tel = church.phone ? '<a href="tel:' + escapeHtml(church.phone.replace(/[^+\d]/g, "")) + '">' + escapeHtml(church.phone) + '</a>' : "";
+    var rectorLine = church.rector ? "<dt>Настоятель</dt><dd>" + escapeHtml(church.rector) + (tel ? ", " + tel : "") + "</dd>" : "";
+    var servicesLine = church.services ? "<dt>Богослужения</dt><dd>" + escapeHtml(church.services) + "</dd>" : "";
+    var thereLine = church.gettingThere ? "<dt>Дорога</dt><dd>" + escapeHtml(church.gettingThere) + "</dd>" : "";
+    return '<section class="visit-panel"><h2>Как добраться</h2><dl class="visit-facts">' +
+      thereLine + servicesLine + rectorLine + "</dl>" +
+      '<p class="visit-note">Расписание автобусов и богослужений лучше уточнить перед поездкой: рейсы и службы меняются.</p></section>';
+  }
   function neighboursHtml(church) {
     var nb = R.routeNeighbours(church);
     return '<nav class="route-nav" aria-label="Навигация по маршруту">' +
@@ -154,7 +165,7 @@
       return '<li data-slug="' + church.slug + '"><span class="route-step">' + (index + 1) + '</span>' + markerHtml(church) +
         '<a class="route-name" href="#/' + church.slug + '">' + escapeHtml(church.name) + '</a><span class="route-settlement">' + escapeHtml(church.settlement) + '</span><a class="btn btn-ghost" href="#/' + church.slug + '">Открыть</a></li>';
     }).join("");
-    app.innerHTML = '<section class="hero">' + heroRibbonHtml() + '<p class="eyebrow">Исторический маршрут · 3 остановки</p><h1>Храмы Мостовского района</h1><p>Маршрут по трём православным храмам Мостовского района Гродненской области — Гудевичи, Пески и Дубно: сельские церкви XIX века, каждая со своей историей и характером.</p><p class="hero-guide"><strong>С чего начать:</strong> выберите номер на схеме или откройте остановку ниже.</p></section><section class="map-schema" aria-label="Схема маршрута"><div class="legend"><span class="legend-item"><span class="marker-sample orthodox"></span> православный храм</span></div></section><section><h2>Остановки маршрута</h2><ol class="route-list">' + items + '</ol></section>';
+    app.innerHTML = '<section class="hero">' + heroRibbonHtml() + '<p class="eyebrow">Исторический маршрут · 3 остановки</p><h1>Храмы Мостовского района</h1><p>Маршрут по трём православным храмам Мостовского района Гродненской области — Гудевичи, Пески и Дубно: сельские церкви XIX века, каждая со своей историей и характером.</p><p class="hero-guide"><strong>С чего начать:</strong> выберите номер на схеме или откройте остановку ниже.</p></section><section class="map-schema" aria-label="Схема маршрута"><div class="legend"><span class="legend-item"><span class="marker-sample orthodox"></span> православный храм</span></div></section><section><h2>Остановки маршрута</h2>' + transportHintHtml() + '<ol class="route-list">' + items + '</ol></section>';
     document.title = "Храмы Мостовского района";
     var schema = document.querySelector(".map-schema");
     if (schema && window.ChurchMap) { window.ChurchMap.renderSchema(schema); }
@@ -166,7 +177,12 @@
     var confession = "православный храм";
     var facts = church.facts.map(function (fact) { return '<li>' + escapeHtml(fact) + '</li>'; }).join("");
     document.title = escapeHtml(church.name) + ' — ' + escapeHtml(church.settlement) + ' · Храмы Мостовского района';
-    app.innerHTML = '<p class="crumbs"><a href="#/">Главная</a> → <a href="#/">Маршрут</a> → <strong>' + escapeHtml(church.name) + '</strong></p><article class="church-page"><header class="church-head"><p class="church-eyebrow">Остановка ' + church.routeStep + ' из ' + ROUTE.length + '</p><h1>' + escapeHtml(church.name) + '</h1><p class="church-subtitle">' + markerHtml(church) + ' ' + escapeHtml(church.settlement) + ' · ' + confession + '</p></header><div class="church-side">' + photoHtml(church) + locatorHtml(church) + factsHtml(church, confession) + mapButtonsHtml(church) + '</div><div class="church-body"><h2>История</h2>' + church.history.map(function (paragraph) { return '<p>' + escapeHtml(paragraph) + '</p>'; }).join("") + '<h2>Интересные факты</h2><ul class="facts-list">' + facts + '</ul>' + sourcesHtml(church) + '</div>' + neighboursHtml(church) + '</article>';
+    app.innerHTML = '<p class="crumbs"><a href="#/">Главная</a> → <a href="#/">Маршрут</a> → <strong>' + escapeHtml(church.name) + '</strong></p><article class="church-page"><header class="church-head"><p class="church-eyebrow">Остановка ' + church.routeStep + ' из ' + ROUTE.length + '</p><h1>' + escapeHtml(church.name) + '</h1><p class="church-subtitle">' + markerHtml(church) + ' ' + escapeHtml(church.settlement) + ' · ' + confession + '</p></header><div class="church-side">' + photoHtml(church) + locatorHtml(church) + factsHtml(church, confession) + mapButtonsHtml(church) + '</div><div class="church-body"><h2>История</h2>' + church.history.map(function (paragraph) { return '<p>' + escapeHtml(paragraph) + '</p>'; }).join("") + '<h2>Интересные факты</h2><ul class="facts-list">' + facts + '</ul>' + visitHtml(church) + sourcesHtml(church) + '</div>' + neighboursHtml(church) + '</article>';
+  }
+  /* Small home-page hint: Mosty is the transport hub for all three stops. */
+  function transportHintHtml() {
+    return '<p class="transport-hint"><strong>Как добраться:</strong> все три остановки связаны с городом Мосты пригородными автобусами ' +
+      "(Гудевичи ~45 мин, Пески ~20 мин, Дубно ~15 мин); подробности — на странице каждого храма.</p>";
   }
   function renderNotFound() {
     var app = resolveApp();

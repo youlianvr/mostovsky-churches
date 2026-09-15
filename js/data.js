@@ -30,6 +30,10 @@ var CHURCHES = [
     status: "действующий",
     address: "д. Гудевичи, ул. Центральная, 6а",
     coords: { lat: 53.3681, lon: 24.1701 },
+    rector: "протоиерей Николай Сень",
+    phone: "+375 1515 2 87 09",
+    services: "Сб, Вс и праздники: утреня и Литургия — 9:00, вечерня — 17:00. Исповедь — по окончании вечерни и за полчаса до утрени.",
+    gettingThere: "От Мостов на запад ~20 км: автобусом до Гудевичи (в пути около 40–45 минут, несколько рейсов в день от автостанции Мосты) или на машине по дороге на Гродно. Остановка «Гудевичи» — в центре агрогородка, храм видно от трассы по шатровой колокольне.",
     photo: "img/photos/gudevichi-rozhdestva.jpg",
     photoCredit: "Автор: Сяргей Яраховіч (Валацуга), Wikimedia Commons, CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:%D0%93%D1%83%D0%B4%D0%B7%D0%B5%D0%B2%D1%96%D1%87%D1%8B._%D0%A1%D0%B2%D1%8F%D1%82%D0%B0-%D0%A0%D0%B0%D1%81%D1%82%D0%B2%D0%B0-%D0%91%D0%B0%D0%B3%D0%B0%D1%80%D0%BE%D0%B4%D0%B7%D1%96%D1%86%D0%BA%D0%B0%D1%8F_%D1%86%D0%B0%D1%80%D0%BA%D0%B2%D0%B0.jpg",
     history: [
@@ -42,7 +46,7 @@ var CHURCHES = [
       "Адрес: ул. Центральная, 6а",
       "Настоятель ведёт занятия с тремя группами учеников школы (94 человека)"
     ],
-    sources: ["orthos.org", "сводка района planetabelarus.by"],
+    sources: ["orthos.org — карточка храма (расписание, телефон)", "сводка района planetabelarus.by"],
     routeStep: 1
   },
 
@@ -58,6 +62,10 @@ var CHURCHES = [
     address: "д. Пески, ул. 50 лет БССР, 40",
     coords: { lat: 53.3549, lon: 24.6267 },
     coordsNote: "точка уточняется (адрес из 2GIS, DG5)",
+    rector: "иерей Виктор Шнайдар",
+    phone: "+375 1515 2 57 68",
+    services: "Сб — вечерня 17:00; Вс — утреня и Литургия 9:00.",
+    gettingThere: "От Мостов на юго-восток ~10 км: автобусом до Песков (15–20 минут, рейсы практически каждые полчаса-час в будни, от ~1–3 руб.) или на машине по дороге на Волковыск. Храм стоит в центре агрогородка, у перекрёстка.",
     photo: "img/photos/peski-nikolaya.jpg",
     photoCredit: "Автор: Валацуга (fgb.by), Wikimedia Commons, CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:%D0%9F%D0%B5%D1%81%D0%BA%D1%96_(%D0%9C%D0%B0%D1%81%D1%82%D0%BE%D1%8E%D1%81%D0%BA%D1%96_%D1%80%D0%B0%D1%91%D0%BD)._%D0%A6%D0%B0%D1%80%D0%BA%D0%B2%D0%B0_%D0%A1%D0%B2%D1%8F%D1%82%D0%BE%D0%B3%D0%BE_%D0%9C%D1%96%D0%BA%D0%B0%D0%BB%D0%B0%D1%8F_(01).jpg",
     history: [
@@ -88,6 +96,10 @@ var CHURCHES = [
     status: "действующий",
     address: "д. Дубно",
     coords: { lat: 53.4447, lon: 24.3706 },
+    rector: "иерей Николай Гляд",
+    phone: "+375 29 582-30-21",
+    services: "Сб — 17:00; Вс — 9:00.",
+    gettingThere: "От Мостов на северо-восток ~13 км: автобусом до Дубно (около 15–18 минут, несколько рейсов в день) или на машине. Остановка у поворота в деревню, дальше пешком — купол виден от дороги.",
     photo: "img/photos/dubno-nikolaya.jpg",
     photoCredit: "Автор: Борис Мавлютов, Wikimedia Commons, CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:%D0%94%D1%83%D0%B1%D0%BD%D0%BE._%D0%A6%D0%B5%D1%80%D0%BA%D0%BE%D0%B2%D1%8C_%D0%92%D0%BE%D0%B7%D0%BD%D0%B5%D1%81%D0%B5%D0%BD%D0%B8%D1%8F_%D0%93%D0%BE%D1%81%D0%BF%D0%BE%D0%B4%D0%BD%D1%8F.jpg",
     history: [
