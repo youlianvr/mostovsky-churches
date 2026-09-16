@@ -128,9 +128,10 @@ check(markerPaint.length === 3 && markerPaint.every(function (marker) {
   return marker.indexOf("map-marker-icon") !== -1 && marker.indexOf("ci-cross") !== -1;
 }), "each marker must be the church icon, cross included");
 check(count(schema, "legend-icon") === 1, "legend must show the same church icon");
-check(/map-route-line" points="([^"]+)"/.test(schema) &&
-  schema.match(/map-route-line" points="([^"]+)"/)[1].trim().split(/\s+/).length === 3,
-  "route line must connect the 3 stops");
+/* Нитка маршрута теперь по реальным дорогам: 4 перегона OSRM, и первый
+ * перегон начинается в Гродно, а не в первой остановке. */
+check((schema.match(/map-route-line"/g) || []).length === 4,
+  "route line must draw 4 road legs");
 TRIO.forEach(function (slug) {
   check(schema.indexOf('href="#/' + slug + '"') !== -1, "the " + slug + " marker must open its page");
 });

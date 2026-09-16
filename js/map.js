@@ -28,33 +28,60 @@
       '</g>' + markerLabel(point) + '</a>';
   }
 
+  /* Неподписанные деревни схемы не засоряют: подписываем только город Мосты
+   * (конечная точка маршрута) и реку. */
+  function placeLabels() {
+    var mosty = G.project(53.4134, 24.5428);
+    return '<text class="map-town-label" x="' + mosty.x.toFixed(1) + '" y="' + (mosty.y - 14).toFixed(1) + '">г. Мосты</text>';
+  }
+
   function legendHtml() {
     return '<div class="legend">' +
       '<span class="legend-item">' + H.icon("legend-icon") +
       '<span>остановка маршрута: иконка церкви с номером шага</span></span>' +
-      '<span class="legend-item"><span class="legend-route"></span><span>нитка маршрута</span></span>' +
+      '<span class="legend-item"><span class="legend-route"></span><span>нитка маршрута по дорогам</span></span>' +
+      '<span class="legend-item"><span class="legend-road"></span><span>М6 · Р41 · Р44</span></span>' +
       '</div>';
   }
 
+  function roadPaths(list, cls) {
+    return list.map(function (road) { return '<path class="' + cls + '" d="' + G.pathString(road, false) + '"/>'; }).join("");
+  }
+
   function backgroundHtml() {
-    var riverMid = G.RIVER[0][Math.floor(G.RIVER[0].length / 2)];
-    var riverPos = G.pointString(riverMid[1], riverMid[0]).split(",");
+    var riverPos = G.project(53.478, 24.34).x.toFixed(1) + "," + (G.project(53.478, 24.34).y - 10).toFixed(1);
     return '<g class="map-background" aria-hidden="true" pointer-events="none">' +
       '<path class="map-district" pointer-events="none" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
+      roadPaths(G.R44, "map-road") +
+      roadPaths(G.R41, "map-road") +
+      roadPaths(G.M6, "map-motorway") +
       '<path class="map-river" d="' + G.RIVER.map(function (part) { return G.pathString(part, false); }).join(" ") + '"/>' +
-      '<text class="map-water-label" x="' + riverPos[0] + '" y="' + (parseFloat(riverPos[1]) - 8) + '">р. Неман</text>' +
-      G.ROADS.map(function (road) { return '<path class="map-road" d="' + G.pathString(road, false) + '"/>'; }).join("") +
+      '<text class="map-water-label" x="' + riverPos.split(",")[0] + '" y="' + riverPos.split(",")[1] + '">р. Неман</text>' +
+      '<text class="map-road-ref" x="' + (G.project(53.438, 24.47).x + 6).toFixed(0) + '" y="' + (G.project(53.438, 24.47).y - 6).toFixed(0) + '">Р41</text>' +
+      '<text class="map-road-ref" x="' + (G.project(53.637, 24.30).x + 6).toFixed(0) + '" y="' + (G.project(53.637, 24.30).y - 4).toFixed(0) + '">М6</text>' +
+      '<text class="map-road-ref" x="' + (G.project(53.50, 24.05).x + 6).toFixed(0) + '" y="' + (G.project(53.50, 24.05).y - 4).toFixed(0) + '">Р44</text>' +
+      placeLabels() +
       '</g>';
   }
 
-  function svgHtml(points) {
-    var routeLine = points.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ");
+  function svgHtml() {
     return '<svg viewBox="0 0 ' + G.W + ' ' + G.H + '" xmlns="http://www.w3.org/2000/svg" role="img" ' +
       'aria-label="Схема маршрута по трём храмам Мостовского района">' +
       backgroundHtml() +
-      '<polyline class="map-route-line-casing" points="' + routeLine + '"/>' +
-      '<polyline class="map-route-line" points="' + routeLine + '"/>' +
-      points.map(marker).join("") + '</svg>';
+      /* Нитка маршрута — по реальным дорогам (OSRM over OSM), четыре перегона. */
+      '<g class="map-route-g">' +
+      G.ROUTE_ROADS.map(function (leg) {
+        return '<polyline class="map-route-line-casing" points="' +
+          leg.map(function (p) { return G.pointString(p[1], p[0]); }).join(" ") + '"/>' +
+          '<polyline class="map-route-line" points="' +
+          leg.map(function (p) { return G.pointString(p[1], p[0]); }).join(" ") + '"/>';
+      }).join("") + '</g>' +
+      ROUTE.map(function (slug, index) {
+        var c = R.findChurchBySlug(slug);
+        var p = G.project(c.coords.lat, c.coords.lon);
+        return marker({ slug: c.slug, name: c.name, settlement: c.settlement, label: G.shortLabel ? G.shortLabel(c.settlement) : c.settlement, step: index + 1, x: p.x, y: p.y });
+      }).join("") +
+      '</svg>';
   }
 
   /* Аффорданс горизонтальной прокрутки: подсказка и краевые тени видны
@@ -93,11 +120,10 @@
   }
 
   function renderSchema(element) {
-    var points = G.routePoints(ROUTE.map(R.findChurchBySlug));
-    element.innerHTML = svgHtml(points) + legendHtml() +
-      '<p class="map-attribution">Геометрия района, река и дороги — ' +
+    element.innerHTML = svgHtml() + legendHtml() +
+      '<p class="map-attribution">Геометрия района, реки и дорог, автопуть маршрута — ' +
       '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">' +
-      '© OpenStreetMap contributors</a> (ODbL 1.0)</p>' +
+      '© OpenStreetMap contributors</a> (ODbL 1.0), маршрут — OSRM</p>' +
       '<p class="map-scroll-hint" aria-hidden="true">Схема широкая — прокручивайте <span class="map-scroll-arrow">→</span></p>';
     wireScrollAffordance(element);
     wireActivation(element);
