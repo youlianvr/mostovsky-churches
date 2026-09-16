@@ -17,8 +17,7 @@ const { chromium } = require("playwright");
     ["map", "Карта-схема"],
     ["opis", "Описание"],
     ["logistika", "Логистика"],
-    ["spravka", "Справочная информация"],
-    ["foto", "Фотоотчёт"]
+    ["spravka", "Справочная информация"]
   ];
 
   await page.goto(base + "#/", { waitUntil: "networkidle" });
@@ -28,7 +27,7 @@ const { chromium } = require("playwright");
   /* Каждый отдел Блока 1 открывается по своему адресу и даёт заголовок. */
   for (const [route, label] of SECTIONS) {
     await page.goto(base + "#/" + route, { waitUntil: "networkidle" });
-    check(await page.locator(".navbar-links a").count() === 6, "navbar must expose six sections");
+    check(await page.locator(".navbar-links a").count() === 5, "navbar must expose the five section pages");
     check((await page.locator("h1").first().textContent()).length > 0, label + " must render a heading");
   }
 
@@ -57,14 +56,21 @@ const { chromium } = require("playwright");
   check(await page.locator(".stop-card").count() === 3, "reference page must show three parish cards");
   check(await page.locator(".source-check").count() >= 5, "reference page must list at least five sources");
 
-  /* Фотоотчёт: шесть честных пустых слотов до поездки. */
+  /* Фотоотчёт: честные пустые слоты на странице каждого храма. */
+  for (const slug of ["gudevichi-rozhdestva", "lunno-predtechi", "dubno-nikolaya"]) {
+    await page.goto(base + "#/" + slug, { waitUntil: "networkidle" });
+    check(await page.locator(".report-slot").count() === 2, slug + ": photo report must render its slots on the church page");
+    check(await page.locator(".report-slot.is-filled").count() === 0, slug + ": slots stay empty until personal photos exist");
+  }
+
+  /* Устаревший адрес #/foto ведёт на страницу первого храма. */
   await page.goto(base + "#/foto", { waitUntil: "networkidle" });
-  check(await page.locator(".report-slot").count() === 6, "photo report must render six slots");
-  check(await page.locator(".report-slot.is-filled").count() === 0, "slots stay empty until personal photos exist");
+  await page.waitForFunction(() => location.hash === "#/gudevichi-rozhdestva");
+  check((await page.locator("h1").textContent()).includes("Рождества"), "old #/foto address must redirect to the first church page");
 
   await page.goto(base + "#/does-not-exist", { waitUntil: "networkidle" });
   check((await page.locator("h1").textContent()).trim() === "Храм не найден", "unknown slug must render 404");
   check(errors.length === 0, "browser console errors: " + errors.join(" | "));
   await browser.close();
-  console.log("browser contract v3 | six sections, icon markers, navigation, map links, 404: PASS");
+  console.log("browser contract v4 | five sections, photo report on church pages, icon markers, navigation, map links, 404: PASS");
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });

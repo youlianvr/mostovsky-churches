@@ -699,6 +699,23 @@ a:hover { color: var(--color-ochre-deep); }
 }
 .slot-meta { font-style: italic; }
 
+/* Фотоотчёт на странице храма */
+.report-panel {
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+}
+.report-panel .page-lead { margin-bottom: var(--space-md); }
+
+/* Атрибуция данных схемы (требование лицензии ODbL) */
+.map-attribution {
+  font-size: var(--fs-small);
+  color: var(--color-muted);
+  margin: var(--space-xs) 0 0;
+}
+
 /* ---------- Схема (SVG) ---------- */
 .map-schema {
   overflow-x: auto;
@@ -709,7 +726,7 @@ a:hover { color: var(--color-ochre-deep); }
   scrollbar-color: var(--color-ochre) var(--color-bg-soft);   /* на мобильных схема скроллится по горизонтали,
                                      метки сохраняют читаемый размер (этап 7 — полировка) */
 }
-.map-schema svg {
+.map-schema > svg {
   display: block;
   min-width: 720px;              /* фикс. ширина в логических единицах схемы */
   width: 100%;
@@ -726,11 +743,6 @@ a:hover { color: var(--color-ochre-deep); }
   fill: #efe4ca;
   stroke: var(--color-ochre);
   stroke-width: 2;
-}
-
-.map-forest {
-  fill: #d5dcc0;
-  opacity: 0.75;
 }
 
 .map-river {
@@ -831,7 +843,7 @@ a:hover { color: var(--color-ochre-deep); }
   margin-top: var(--space-sm);
 }
 .legend-item { display: inline-flex; align-items: center; gap: var(--space-xs); }
-.legend-icon { width: 1.6rem; height: auto; }
+.legend-icon { width: 1.6rem; height: 1.84rem; flex: 0 0 auto; }
 .legend-route {
   display: inline-block;
   width: 2rem;

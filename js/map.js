@@ -1,6 +1,8 @@
 /* Интерфейс карты-схемы: единственный владелец SVG-разметки схемы, её
  * подписей и поведения (клик, клавиатура, горизонтальная прокрутка).
- * Данные приходят извне: точки считает map-geometry по порядку из роутера. */
+ * Данные приходят извне: точки считает map-geometry по порядку из роутера.
+ * Геометрия подложки — настоящая (OpenStreetMap); на схеме обязательна
+ * атрибуция данных OSM. */
 (function () {
   "use strict";
   var G = window.ChurchMapGeometry;
@@ -35,17 +37,12 @@
   }
 
   function backgroundHtml() {
-    var mid = Math.floor(G.RIVER.length / 2);
-    var riverMid = G.pointString(G.RIVER[mid][1], G.RIVER[mid][0]).split(",");
+    var riverMid = G.RIVER[0][Math.floor(G.RIVER[0].length / 2)];
+    var riverPos = G.pointString(riverMid[1], riverMid[0]).split(",");
     return '<g class="map-background" aria-hidden="true" pointer-events="none">' +
       '<path class="map-district" pointer-events="none" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
-      G.FORESTS.map(function (forest) {
-        var center = G.project(forest[1], forest[0]);
-        return '<ellipse class="map-forest" cx="' + center.x.toFixed(1) + '" cy="' + center.y.toFixed(1) +
-          '" rx="' + forest[2] + '" ry="' + forest[3] + '"/>';
-      }).join("") +
-      '<path class="map-river" d="' + G.pathString(G.RIVER, false) + '"/>' +
-      '<text class="map-water-label" x="' + riverMid[0] + '" y="' + (parseFloat(riverMid[1]) - 8) + '">р. Неман</text>' +
+      '<path class="map-river" d="' + G.RIVER.map(function (part) { return G.pathString(part, false); }).join(" ") + '"/>' +
+      '<text class="map-water-label" x="' + riverPos[0] + '" y="' + (parseFloat(riverPos[1]) - 8) + '">р. Неман</text>' +
       G.ROADS.map(function (road) { return '<path class="map-road" d="' + G.pathString(road, false) + '"/>'; }).join("") +
       '</g>';
   }
@@ -98,6 +95,9 @@
   function renderSchema(element) {
     var points = G.routePoints(ROUTE.map(R.findChurchBySlug));
     element.innerHTML = svgHtml(points) + legendHtml() +
+      '<p class="map-attribution">Геометрия района, река и дороги — ' +
+      '<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">' +
+      '© OpenStreetMap contributors</a> (ODbL 1.0)</p>' +
       '<p class="map-scroll-hint" aria-hidden="true">Схема широкая — прокручивайте <span class="map-scroll-arrow">→</span></p>';
     wireScrollAffordance(element);
     wireActivation(element);

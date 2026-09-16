@@ -1,8 +1,9 @@
 /* Страница объекта и служебные виды вокруг неё: фото с атрибуцией, локатор
  * района, панель фактов, кнопки внешних карт, «как добраться», источники,
- * переходы к соседним остановкам. Данные только читаются (подписи — из
- * data.js), разметка берётся из js/dom.js, схема района — из js/map-geometry.js.
- * Размеры фото приходят из данных, поэтому браузер резервирует место заранее. */
+ * переходы к соседним остановкам, фотоотчёт этого храма. Данные только
+ * читаются (подписи — из data.js), разметка берётся из js/dom.js, схема
+ * района — из js/map-geometry.js. Размеры фото приходят из данных, поэтому
+ * браузер резервирует место заранее. */
 (function () {
   "use strict";
   var H = window.ChurchHtml;
@@ -60,7 +61,7 @@
       : "";
     return '<figure class="locator-map"><svg viewBox="0 0 ' + G.W + " " + G.H + '" aria-hidden="true" focusable="false">' +
       '<path class="locator-district" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
-      '<path class="locator-river" d="' + G.pathString(G.RIVER, false) + '"/>' +
+      '<path class="locator-river" d="' + G.RIVER.map(function (part) { return G.pathString(part, false); }).join(" ") + '"/>' +
       markers + label + "</svg>" +
       "<figcaption>Положение на схеме района: " + H.escape(church.settlement) + "</figcaption></figure>";
   }
@@ -96,6 +97,28 @@
     return '<section class="source-panel"><h2>Источники</h2><ul class="sources">' + items + "</ul></section>";
   }
 
+  /* Фотоотчёт этого храма: те же слоты, что раньше были на отдельной
+   * странице #/foto, — по числу видов кадров из PHOTO_REPORT.kinds. */
+  function reportHtml(church) {
+    var slots = PHOTO_REPORT.kinds.map(function (kind, index) {
+      var photo = (church.visitPhotos || [])[index];
+      if (photo && photo.src) {
+        return '<figure class="report-slot is-filled"><img src="' + H.escape(photo.src) + '" alt="' +
+          H.escape(church.shortName + " — " + kind) + '" loading="lazy"><figcaption><strong>' + H.escape(kind) +
+          "</strong>" + (photo.credit ? '<br><span class="slot-meta">' + H.escape(photo.credit) + "</span>" : "") +
+          "</figcaption></figure>";
+      }
+      return '<figure class="report-slot"><div class="report-slot-frame" role="img" aria-label="Фотография добавляется после поездки">' +
+        '<span class="slot-plus" aria-hidden="true">+</span><span class="slot-caption">Фото добавляется</span></div>' +
+        "<figcaption><strong>" + H.escape(kind) + "</strong>" +
+        '<br><span class="slot-meta">после поездки: файл в img/photos/visit/ и строка в data.js</span></figcaption></figure>';
+    }).join("");
+    return '<section class="report-panel"><h2>Фотоотчёт о посещении</h2>' +
+      '<p class="page-lead">' + H.escape(PHOTO_REPORT.lead) + "</p>" +
+      '<div class="report-grid">' + slots + "</div>" +
+      '<p class="data-note">' + H.escape(PHOTO_REPORT.note) + "</p></section>";
+  }
+
   function neighboursHtml(church) {
     var nb = R.routeNeighbours(church);
     return '<nav class="route-nav" aria-label="Навигация по маршруту">' +
@@ -118,7 +141,7 @@
       mapButtonsHtml(church) + "</div>" +
       '<div class="church-body"><h2>История</h2>' + history +
       '<h2>Интересные факты</h2><ul class="facts-list">' + facts + "</ul>" +
-      visitHtml(church) + sourcesHtml(church) + "</div>" +
+      visitHtml(church) + reportHtml(church) + sourcesHtml(church) + "</div>" +
       neighboursHtml(church) + "</article>",
       H.escape(church.name) + " — " + H.escape(church.settlement) + " · Храмы Мостовского района");
   }

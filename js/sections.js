@@ -87,7 +87,7 @@
       '<p class="page-lead">Схематичная карта Мостовского района: иконки церквей — три остановки маршрута, пунктирная линия — порядок движения. Номер на иконке — шаг маршрута, клик по иконке открывает страницу храма.</p>' +
       '<section class="map-schema" aria-label="Схема маршрута"></section>' +
       '<section><h2>Объекты на схеме</h2><ol class="route-list">' + list + "</ol></section>" +
-      '<p class="data-note">Схема условная: контур района, река Неман, леса и дороги даны обобщённо — это не навигационная карта. Точные координаты каждого храма открываются кнопками «Открыть на Яндекс.Картах» на странице храма.</p>' +
+      '<p class="data-note">Граница района, Нёман и дороги — реальные данные OpenStreetMap (схема не заменяет навигатор). Точные координаты каждого храма открываются кнопками «Открыть на Яндекс.Картах» на странице храма.</p>' +
       sectionNavHtml("map"),
       "Карта-схема — Храмы Мостовского района");
     var schema = document.querySelector(".map-schema");
@@ -223,37 +223,6 @@
       "Справочная информация — Храмы Мостовского района");
   }
 
-  /* ---------- 6. Фотоотчёт ---------- */
-  function photoSlotHtml(c, kind, index) {
-    var photo = (c.visitPhotos || [])[index];
-    if (photo && photo.src) {
-      return '<figure class="report-slot is-filled"><img src="' + H.escape(photo.src) + '" alt="' +
-        H.escape(c.shortName + " — " + kind) + '" loading="lazy"><figcaption><strong>' + H.escape(c.shortName) +
-        "</strong><br>" + H.escape(kind) + (photo.credit ? '<br><span class="slot-meta">' + H.escape(photo.credit) + "</span>" : "") +
-        "</figcaption></figure>";
-    }
-    return '<figure class="report-slot"><div class="report-slot-frame" role="img" aria-label="Фотография добавляется после поездки">' +
-      '<span class="slot-plus" aria-hidden="true">+</span><span class="slot-caption">Фото добавляется</span></div>' +
-      "<figcaption><strong>" + H.escape(c.shortName) + "</strong><br>" + H.escape(kind) +
-      '<br><span class="slot-meta">после поездки: файл в img/photos/visit/ и строка в data.js</span></figcaption></figure>';
-  }
-
-  function renderFoto() {
-    var slots = "";
-    ROUTE.forEach(function (slug) {
-      var c = church(slug);
-      PHOTO_REPORT.kinds.forEach(function (kind, index) { slots += photoSlotHtml(c, kind, index); });
-    });
-    H.paint("<h1>Фотоотчёт о посещении</h1>" +
-      '<p class="page-lead">' + H.escape(PHOTO_REPORT.lead) + "</p>" +
-      '<section><h2>Кадры, которые нужно сделать</h2><div class="report-grid">' + slots + "</div></section>" +
-      '<section class="card"><h2>Как добавить фотографии</h2><ol class="facts-list">' +
-      PHOTO_REPORT.howto.map(function (step) { return "<li>" + H.escape(step) + "</li>"; }).join("") + "</ol>" +
-      '<p class="data-note">' + H.escape(PHOTO_REPORT.note) + "</p></section>" +
-      sectionNavHtml("foto"),
-      "Фотоотчёт — Храмы Мостовского района");
-  }
-
   /* Единственный список отделов: адрес, подпись и отрисовка в одном месте.
    * app.js берёт отсюда маршруты, поэтому добавить седьмой отдел — значит
    * дописать одну строку здесь (плюс ссылку в шапке index.html). */
@@ -263,7 +232,6 @@
     { id: "opis", href: "#/opis", label: "Описание", render: renderOpis },
     { id: "logistika", href: "#/logistika", label: "Логистика", render: renderLogistika },
     { id: "spravka", href: "#/spravka", label: "Справочная информация", render: renderSpravka },
-    { id: "foto", href: "#/foto", label: "Фотоотчёт", render: renderFoto }
   ];
 
   function findSection(id) {

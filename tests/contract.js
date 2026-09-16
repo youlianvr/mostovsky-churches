@@ -34,11 +34,12 @@ var appEl = element();
 var mapBox = element();
 var listeners = {};
 global.window = {
-  location: { hash: "#/" },
+  location: { hash: "#/", replace: function (url) { this.hash = url; } },
   addEventListener: function (type, handler) { (listeners[type] = listeners[type] || []).push(handler); },
   scrollTo: function () {}
 };
 global.document = {
+  title: "",
   getElementById: function (id) { return id === "app" ? appEl : null; },
   querySelector: function (selector) { return selector === ".map-schema" ? mapBox : null; },
   querySelectorAll: function () { return []; }
@@ -67,10 +68,11 @@ check(!/views\.js|ChurchViews/.test(indexHtml + aboutHtml), "pages must not load
 check(/<script/.test(indexHtml), "index.html must load the app");
 check(!/<script/.test(aboutHtml), "about.html is static and must not load app code");
 
-/* --- block 1: six required elements, in the wording of the competition --- */
-var REQUIRED_LABELS = ["Нитка маршрута", "Карта-схема", "Описание", "Логистика", "Справочная информация", "Фотоотчёт"];
+/* --- block 1: five section pages in the nav; the sixth required element,
+ * the photo report, must render on every church page (checked below) --- */
+var REQUIRED_LABELS = ["Нитка маршрута", "Карта-схема", "Описание", "Логистика", "Справочная информация"];
 check(sections.map(function (s) { return s.label; }).join("|") === REQUIRED_LABELS.join("|"),
-  "the six block-1 elements must exist in the document's order and wording");
+  "the nav must carry the five section pages in the document's order");
 sections.forEach(function (item) {
   check(indexHtml.indexOf('href="' + item.href + '"') !== -1, "navbar must link " + item.label + " (" + item.href + ")");
 });
@@ -86,8 +88,9 @@ fire("DOMContentLoaded");
 check(appEl.innerHTML.indexOf("Остановки маршрута") !== -1, "empty hash must dispatch to the itinerary");
 check(document.title === "Нитка маршрута — Храмы Мостовского района", "itinerary must own the tab title");
 window.location.hash = "#/foto";
-fire("hashchange");
-check(document.title === "Фотоотчёт — Храмы Мостовского района", "#/foto must dispatch to the photo report");
+fire("hashchange");           /* the redirect itself */
+fire("hashchange");           /* the browser fires hashchange once more for the new hash */
+check(document.title.indexOf("Рождества Пресвятой Богородицы") !== -1, "#/foto must redirect to the first church page with its photo report");
 window.location.hash = "#/lunno-predtechi";
 fire("hashchange");
 check(document.title.indexOf("Иоанна Предтечи") !== -1, "a church slug must dispatch to its page");
@@ -132,6 +135,8 @@ TRIO.forEach(function (slug) {
   check(schema.indexOf('href="#/' + slug + '"') !== -1, "the " + slug + " marker must open its page");
 });
 check(schema.indexOf("cluster") === -1, "no clustering may remain in the schema");
+check((appEl.innerHTML + mapBox.innerHTML).indexOf("openstreetmap.org/copyright") !== -1,
+  "the schema must attribute OpenStreetMap data (ODbL requirement)");
 
 /* --- description: historical note and the appeal of every object --- */
 section("opis").render();
@@ -193,14 +198,18 @@ check(appEl.innerHTML.indexOf("Где поесть") !== -1 && FOOD.places.every
 }), "reference must list real places to eat");
 check(count(appEl.innerHTML, 'class="source-check') >= 5, "reference must show at least five sources");
 
-/* --- photo report: one honest empty slot per frame, fillable from data --- */
-section("foto").render();
-var slots = ROUTE.length * PHOTO_REPORT.kinds.length;
-check(count(appEl.innerHTML, 'class="report-slot"') === slots, "photo report must offer " + slots + " slots");
-check(count(appEl.innerHTML, "is-filled") === 0, "empty slots must not claim photos before the trip");
-check(appEl.innerHTML.indexOf("Фото добавляется") !== -1, "empty slots must be labelled honestly");
+/* --- photo report on each church page: one honest empty slot per frame,
+ * fillable from data --- */
+ROUTE.forEach(function (slug) {
+  var church = find(slug);
+  window.ChurchPage.render(church);
+  check(count(appEl.innerHTML, 'class="report-slot"') === PHOTO_REPORT.kinds.length,
+    slug + ": page must offer " + PHOTO_REPORT.kinds.length + " photo slots");
+  check(count(appEl.innerHTML, "is-filled") === 0, slug + ": empty slots must not claim photos before the trip");
+  check(appEl.innerHTML.indexOf("Фото добавляется") !== -1, slug + ": empty slots must be labelled honestly");
+});
 find(TRIO[0]).visitPhotos.unshift({ src: "img/photos/visit/test.jpg", credit: "фото автора" });
-section("foto").render();
+window.ChurchPage.render(find(TRIO[0]));
 check(count(appEl.innerHTML, "report-slot is-filled") === 1 &&
   appEl.innerHTML.indexOf('src="img/photos/visit/test.jpg"') !== -1, "a data row must fill its slot");
 find(TRIO[0]).visitPhotos.shift();
@@ -247,7 +256,7 @@ check(error && error.message.indexOf("lunno-predtechi") !== -1,
   "reordered ROUTE must be reported against the object found by slug, got: " + (error && error.message));
 check(dataError(dataSource) === null, "the shipped data must pass its own integrity rule");
 
-console.log("contract v6 (block1-trio, modular) | modules:", modules.join(" → "));
+console.log("contract v7 (block1-trio, modular, photo-on-church-pages) | modules:", modules.join(" → "));
 console.log("sections:", sections.length, "| stops:", ROUTE.length, "| markers:", count(schema, 'class="map-marker-g"'));
 console.log("PROBLEMS:", problems.length ? problems : "none");
 process.exit(problems.length ? 1 : 0);
