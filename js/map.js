@@ -9,9 +9,15 @@
   var R = window.ChurchRouter;
   var H = window.ChurchHtml;
 
+  /* Подпись храма ставится с той стороны иконки, где свободно:
+   * по умолчанию справа, Лунно — слева (справа идёт нитка на Дубно). */
+  var LABEL_LEFT = { lunno: true };
+
   function markerLabel(point) {
-    var x = (point.x + 27).toFixed(1), y = (point.y - 14).toFixed(1);
-    return '<text class="map-marker-label" x="' + x + '" y="' + y + '">' + H.escape(point.label) + '</text>';
+    var left = LABEL_LEFT[point.slug];
+    var x = (point.x + (left ? -27 : 27)).toFixed(1);
+    var anchor = left ? ' text-anchor="end"' : "";
+    return '<text class="map-marker-label"' + anchor + ' x="' + x + '" y="' + (point.y - 14).toFixed(1) + '">' + H.escape(point.label) + '</text>';
   }
 
   /* Иконка стоит над точкой: низ иконки совпадает с координатой храма. */
@@ -32,7 +38,48 @@
    * (конечная точка маршрута) и реку. */
   function placeLabels() {
     var mosty = G.project(53.4134, 24.5428);
-    return '<text class="map-town-label" x="' + mosty.x.toFixed(1) + '" y="' + (mosty.y - 14).toFixed(1) + '">г. Мосты</text>';
+    return '<g class="map-town" pointer-events="none">' +
+      '<circle class="map-town-dot" cx="' + mosty.x.toFixed(1) + '" cy="' + mosty.y.toFixed(1) + '" r="5"/>' +
+      '<text class="map-town-label" x="' + (mosty.x + 12).toFixed(1) + '" y="' + (mosty.y + 5).toFixed(1) + '">г. Мосты</text>' +
+      '</g>';
+  }
+
+  /* Ярлык сидит на своей линии: стартуем с заданной доли длины и идём
+   * по цепочке, пока точка не окажется внутри кадра и подальше от нитки
+   * маршрута (ярлык не должен читаться как подпись нитки). */
+  var REF_AT = { "М6": 0.62, "Р41": 0.95, "Р44": 0.4 };
+
+  function refLabelAt(chains, fraction) {
+    var chain = chains[0];
+    if (!chain || !chain.length) { return null; }
+    var start = Math.floor(chain.length * fraction);
+    for (var d = 0; d < chain.length; d++) {
+      var idx = start + (d % 2 === 0 ? d / 2 : -(d + 1) / 2);
+      if (idx < 0 || idx >= chain.length) { continue; }
+      var p = G.project(chain[idx][1], chain[idx][0]);
+      /* У верхней кромки кадра проходит М6: пускаем туда подпись под линией. */
+      var inFrame = p.x > 50 && p.x < G.W - 50 && p.y > 8 && p.y < G.H - 30;
+      if (!inFrame) { continue; }
+      var nearRoute = G.ROUTE_ROADS.some(function (leg) {
+        return leg.some(function (q) {
+          var r = G.project(q[1], q[0]);
+          return Math.abs(r.x - p.x) < 22 && Math.abs(r.y - p.y) < 14;
+        });
+      });
+      if (!nearRoute) { p.below = p.y < 34; return p; }
+    }
+    return null;
+  }
+
+  function roadRefLabels() {
+    var refs = [[G.M6, "М6"], [G.R41, "Р41"], [G.R44, "Р44"]];
+    return refs.map(function (item) {
+      var chains = item[0].slice().sort(function (a, b) { return b.length - a.length; });
+      var p = refLabelAt(chains, REF_AT[item[1]] || 0.5);
+      if (!p) { return ""; }
+      var ly = p.below ? p.y + 16 : p.y - 6;
+      return '<text class="map-road-ref" x="' + (p.x + 6).toFixed(1) + '" y="' + ly.toFixed(1) + '">' + item[1] + '</text>';
+    }).join("");
   }
 
   function legendHtml() {
@@ -40,7 +87,8 @@
       '<span class="legend-item">' + H.icon("legend-icon") +
       '<span>остановка маршрута: иконка церкви с номером шага</span></span>' +
       '<span class="legend-item"><span class="legend-route"></span><span>нитка маршрута по дорогам</span></span>' +
-      '<span class="legend-item"><span class="legend-road"></span><span>М6 · Р41 · Р44</span></span>' +
+      '<span class="legend-item"><span class="legend-road"></span><span>автодороги, М6 · Р41 · Р44</span></span>' +
+      '<span class="legend-item"><span class="legend-rail"></span><span>железная дорога</span></span>' +
       '</div>';
   }
 
@@ -48,19 +96,33 @@
     return list.map(function (road) { return '<path class="' + cls + '" d="' + G.pathString(road, false) + '"/>'; }).join("");
   }
 
+  /* Перегон из Гродно входит в кадр слева: подписываем вход, чтобы нитка
+   * не начиналась «из ниоткуда». */
+  function routeEntryLabel() {
+    var leg = G.ROUTE_ROADS[0];
+    for (var i = 0; i < leg.length; i++) {
+      if (leg[i][0] >= 24.057) {
+        var p = G.project(leg[i][1], leg[i][0]);
+        return '<text class="map-entry-label" x="' + (p.x + 8).toFixed(1) + '" y="' + (p.y - 8).toFixed(1) + '">из Гродно →</text>';
+      }
+    }
+    return "";
+  }
+
   function backgroundHtml() {
-    var riverPos = G.project(53.478, 24.34).x.toFixed(1) + "," + (G.project(53.478, 24.34).y - 10).toFixed(1);
+    var riverAnchor = G.project(53.478, 24.34);
     return '<g class="map-background" aria-hidden="true" pointer-events="none">' +
       '<path class="map-district" pointer-events="none" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
+      roadPaths(G.RAIL, "map-rail") +
+      roadPaths(G.RAIL, "map-rail-crosstie") +
       roadPaths(G.R44, "map-road") +
       roadPaths(G.R41, "map-road") +
       roadPaths(G.M6, "map-motorway") +
       '<path class="map-river" d="' + G.RIVER.map(function (part) { return G.pathString(part, false); }).join(" ") + '"/>' +
-      '<text class="map-water-label" x="' + riverPos.split(",")[0] + '" y="' + riverPos.split(",")[1] + '">р. Неман</text>' +
-      '<text class="map-road-ref" x="' + (G.project(53.438, 24.47).x + 6).toFixed(0) + '" y="' + (G.project(53.438, 24.47).y - 6).toFixed(0) + '">Р41</text>' +
-      '<text class="map-road-ref" x="' + (G.project(53.637, 24.30).x + 6).toFixed(0) + '" y="' + (G.project(53.637, 24.30).y - 4).toFixed(0) + '">М6</text>' +
-      '<text class="map-road-ref" x="' + (G.project(53.50, 24.05).x + 6).toFixed(0) + '" y="' + (G.project(53.50, 24.05).y - 4).toFixed(0) + '">Р44</text>' +
+      '<text class="map-water-label" x="' + riverAnchor.x.toFixed(1) + '" y="' + (riverAnchor.y - 10).toFixed(1) + '">р. Неман</text>' +
+      roadRefLabels() +
       placeLabels() +
+      routeEntryLabel() +
       '</g>';
   }
 
