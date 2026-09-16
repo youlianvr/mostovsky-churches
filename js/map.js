@@ -72,7 +72,8 @@
   }
 
   function roadRefLabels() {
-    var refs = [[G.M6, "М6"], [G.R41, "Р41"], [G.R44, "Р44"]];
+    /* М6 в кадр не входит (проходит севернее района) — не рисуем и не подписываем. */
+    var refs = [[G.R41, "Р41"], [G.R44, "Р44"]];
     return refs.map(function (item) {
       var chains = item[0].slice().sort(function (a, b) { return b.length - a.length; });
       var p = refLabelAt(chains, REF_AT[item[1]] || 0.5);
@@ -87,7 +88,7 @@
       '<span class="legend-item">' + H.icon("legend-icon") +
       '<span>остановка маршрута: иконка церкви с номером шага</span></span>' +
       '<span class="legend-item"><span class="legend-route"></span><span>нитка маршрута по дорогам</span></span>' +
-      '<span class="legend-item"><span class="legend-road"></span><span>автодороги, М6 · Р41 · Р44</span></span>' +
+      '<span class="legend-item"><span class="legend-road"></span><span>автодороги, Р41 · Р44</span></span>' +
       '<span class="legend-item"><span class="legend-rail"></span><span>железная дорога</span></span>' +
       '</div>';
   }
@@ -101,7 +102,7 @@
   function routeEntryLabel() {
     var leg = G.ROUTE_ROADS[0];
     for (var i = 0; i < leg.length; i++) {
-      if (leg[i][0] >= 24.057) {
+      if (G.pointInDistrict(leg[i][0], leg[i][1])) {
         var p = G.project(leg[i][1], leg[i][0]);
         return '<text class="map-entry-label" x="' + (p.x + 8).toFixed(1) + '" y="' + (p.y - 8).toFixed(1) + '">из Гродно →</text>';
       }
@@ -109,16 +110,22 @@
     return "";
   }
 
+  /* Подложка (обрезается по границе): район, железка, дороги, река. */
   function backgroundHtml() {
-    var riverAnchor = G.project(53.478, 24.34);
     return '<g class="map-background" aria-hidden="true" pointer-events="none">' +
       '<path class="map-district" pointer-events="none" d="' + G.pathString(G.DISTRICT, true) + '"/>' +
       roadPaths(G.RAIL, "map-rail") +
       roadPaths(G.RAIL, "map-rail-crosstie") +
       roadPaths(G.R44, "map-road") +
       roadPaths(G.R41, "map-road") +
-      roadPaths(G.M6, "map-motorway") +
       '<path class="map-river" d="' + G.RIVER.map(function (part) { return G.pathString(part, false); }).join(" ") + '"/>' +
+      '</g>';
+  }
+
+  /* Слой подписей поверх обрезанной подложки: подписи не режутся кромкой. */
+  function labelLayerHtml() {
+    var riverAnchor = G.project(53.478, 24.34);
+    return '<g class="map-labels" pointer-events="none">' +
       '<text class="map-water-label" x="' + riverAnchor.x.toFixed(1) + '" y="' + (riverAnchor.y - 10).toFixed(1) + '">р. Неман</text>' +
       roadRefLabels() +
       placeLabels() +
@@ -126,10 +133,17 @@
       '</g>';
   }
 
+  /* Дороги, река и железка обрезаются по границе района, как на районных
+   * картах; нитка маршрута и метки живут поверх и не обрезаются. */
+  function districtClip() {
+    return '<clipPath id="district-clip"><path d="' + G.pathString(G.DISTRICT, true) + '"/></clipPath>';
+  }
+
   function svgHtml() {
     return '<svg viewBox="0 0 ' + G.W + ' ' + G.H + '" xmlns="http://www.w3.org/2000/svg" role="img" ' +
       'aria-label="Схема маршрута по трём храмам Мостовского района">' +
-      backgroundHtml() +
+      districtClip() +
+      '<g clip-path="url(#district-clip)">' + backgroundHtml() + '</g>' +
       /* Нитка маршрута — по реальным дорогам (OSRM over OSM), четыре перегона. */
       '<g class="map-route-g">' +
       G.ROUTE_ROADS.map(function (leg) {
@@ -138,6 +152,7 @@
           '<polyline class="map-route-line" points="' +
           leg.map(function (p) { return G.pointString(p[1], p[0]); }).join(" ") + '"/>';
       }).join("") + '</g>' +
+      labelLayerHtml() +
       ROUTE.map(function (slug, index) {
         var c = R.findChurchBySlug(slug);
         var p = G.project(c.coords.lat, c.coords.lon);
