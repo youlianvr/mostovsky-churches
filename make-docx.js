@@ -7,6 +7,7 @@ const vm = require("vm");
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType,
   Table, TableRow, TableCell, WidthType, ShadingType, ImageRun,
+  ExternalHyperlink,
 } = require("docx");
 const QRCode = require("qrcode");
 
@@ -79,9 +80,21 @@ function table(widths, header, rows) {
   });
 }
 
-/* Фото из img/photos с подписью-атрибуцией. */
+/* Фото из img/photos с подписью-атрибуцией. Полный URL страницы Commons
+ * прячем в кликабельную ссылку, чтобы мелкая подпись не ломалась на 4 строки. */
 function photo(file, w, h, credit, widthPx = 460) {
   const buf = fs.readFileSync(file);
+  const m = String(credit).match(/^(.*\S)\s+—\s+(https?:\S+)\s*$/s);
+  const creditRuns = m
+    ? [
+        run(m[1] + " — ", { italics: true, size: 18, color: "555555" }),
+        new ExternalHyperlink({
+          link: m[2],
+          children: [run("страница файла на Wikimedia Commons",
+            { italics: true, size: 18, color: "1F4E79", underline: {} })],
+        }),
+      ]
+    : [run(credit, { italics: true, size: 18, color: "555555" })];
   return [
     new Paragraph({
       alignment: AlignmentType.CENTER, spacing: { before: 120, after: 40 },
@@ -90,8 +103,7 @@ function photo(file, w, h, credit, widthPx = 460) {
         transformation: { width: widthPx, height: Math.round(widthPx * h / w) },
       })],
     }),
-    para(run(credit, { italics: true, size: 18, color: "555555" }),
-      { alignment: AlignmentType.CENTER, spacing: { after: 160 } }),
+    para(creditRuns, { alignment: AlignmentType.CENTER, spacing: { after: 160 } }),
   ];
 }
 
@@ -204,7 +216,7 @@ for (let i = 0; i < stops.length; i++) {
 }
 children.push(h3("Перегоны"));
 children.push(table(
-  [700, 2900, 1900, 1400, 2940],
+  [600, 2700, 1600, 1300, 3640],
   ["№", "Участок", "Способ", "Расстояние", "Время"],
   ROUTE_LEGS.map((l, i) => [
     String(i + 1),
@@ -282,7 +294,7 @@ children.push(table(
 ));
 children.push(h3("Перегоны между остановками"));
 children.push(table(
-  [700, 2900, 1900, 1400, 2940],
+  [600, 2700, 1600, 1300, 3640],
   ["№", "Участок", "Способ", "Расстояние", "Время"],
   ROUTE_LEGS.map((l, i) => [
     String(i + 1),
