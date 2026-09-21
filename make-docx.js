@@ -8,6 +8,7 @@ const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType,
   Table, TableRow, TableCell, WidthType, ShadingType, ImageRun,
 } = require("docx");
+const QRCode = require("qrcode");
 
 /* --- данные сайта --- */
 const sandbox = { console };
@@ -94,6 +95,74 @@ function photo(file, w, h, credit, widthPx = 460) {
   ];
 }
 
+/* QR-код: картинка с подписью-ссылкой. Размер фиксированный, 96 pt ≈ 3,4 см. */
+function qrBlock(url, caption, sizePx = 130) {
+  return new Paragraph({
+    alignment: AlignmentType.CENTER, spacing: { before: 120, after: 40 },
+    children: [new ImageRun({ type: "png", data: qrCache[url], transformation: { width: sizePx, height: sizePx } })],
+  });
+}
+/* QR генерируются синхронно на старте: qrcode.toBuffer асинхронен, поэтому
+ * рисуем модули сами через синхронный QRCode.create и пишем PNG в буфер. */
+const SITE = "https://youlianvr.github.io/mostovsky-churches/";
+const qrCache = (() => {
+  const urls = [SITE, ...stops.map((c) => SITE + "#/" + c.slug)];
+  const out = {};
+  for (const url of urls) {
+    const qr = QRCode.create(url, { errorCorrectionLevel: "M" });
+    const n = qr.modules.size, data = qr.modules.data;
+    const scale = 8, quiet = 4, size = (n + quiet * 2) * scale;
+    const rows = [];
+    /* RAW-пиксели -> PNG без библиотек: кодируем ч/б bitmap как PNG вручную */
+    const px = Buffer.alloc(size * size);
+    for (let y = 0; y < size; y++) {
+      const my = Math.floor(y / scale) - quiet;
+      for (let x = 0; x < size; x++) {
+        const mx = Math.floor(x / scale) - quiet;
+        const dark = my >= 0 && my < n && mx >= 0 && mx < n && data[my * n + mx];
+        px[y * size + x] = dark ? 0 : 255;
+      }
+    }
+    out[url] = encodePng(px, size, size);
+  }
+  return out;
+})();
+
+/* Минимальный PNG-писатель: серый 8-бит, без фильтров, zlib из node. */
+function encodePng(px, w, h) {
+  const zlib = require("zlib");
+  const raw = Buffer.alloc((w + 1) * h);
+  for (let y = 0; y < h; y++) {
+    raw[y * (w + 1)] = 0; /* filter: none */
+    px.copy(raw, y * (w + 1) + 1, y * w, (y + 1) * w);
+  }
+  const idat = zlib.deflateSync(raw);
+  function chunk(type, data) {
+    const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+    const body = Buffer.concat([Buffer.from(type, "ascii"), data]);
+    const crc = Buffer.alloc(4); crc.writeUInt32BE(crc32(body) >>> 0);
+    return Buffer.concat([len, body, crc]);
+  }
+  let crcTable = [];
+  for (let n2 = 0; n2 < 256; n2++) {
+    let c = n2;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    crcTable[n2] = c;
+  }
+  function crc32(buf) {
+    let c = 0xffffffff;
+    for (let i = 0; i < buf.length; i++) c = crcTable[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+    return c ^ 0xffffffff;
+  }
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4);
+  ihdr[8] = 8; ihdr[9] = 0; /* 8-bit grayscale */
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk("IHDR", ihdr), chunk("IDAT", idat), chunk("IEND", Buffer.alloc(0)),
+  ]);
+}
+
 const children = [];
 
 /* ================= Титул ================= */
@@ -111,6 +180,9 @@ children.push(
   para([run("Интерактивная версия: ", { bold: true }),
     run("https://youlianvr.github.io/mostovsky-churches/", { color: "1F4E79", underline: {} })],
     { alignment: AlignmentType.CENTER }),
+  qrBlock(SITE),
+  para(run("QR-код ведёт на интерактивную версию проекта — наведите камеру телефона.",
+    { italics: true, size: 20, color: "555555" }), { alignment: AlignmentType.CENTER }),
 );
 
 /* ================= 1. Нитка маршрута ================= */
@@ -322,29 +394,39 @@ for (const c of stops) {
   if (notes.length) children.push(para([run("Примечание: ", { bold: true }), run(notes.join(". "))]));
   children.push(para(run("Источники по объекту:", { bold: true }), { spacing: { after: 40 } }));
   for (const s of c.sources) children.push(bullet(s));
+  const churchUrl = SITE + "#/" + c.slug;
+  children.push(qrBlock(churchUrl));
+  children.push(para([
+    run("Интерактивная страница храма: ", { bold: true, size: 20 }),
+    run(churchUrl, { size: 20, color: "1F4E79" }),
+  ], { alignment: AlignmentType.CENTER, spacing: { after: 40 } }));
+  children.push(para(run("QR-код открывает эту страницу храма на сайте проекта.",
+    { italics: true, size: 18, color: "555555" }), { alignment: AlignmentType.CENTER }));
 }
 
 /* ================= документ ================= */
-const doc = new Document({
-  numbering: {
-    config: [{
-      reference: "dots",
-      levels: [{
-        level: 0, format: "bullet", text: "•", alignment: AlignmentType.LEFT,
-        style: { paragraph: { indent: { left: 425, hanging: 425 } } },
+function buildDoc() {
+  return new Document({
+    numbering: {
+      config: [{
+        reference: "dots",
+        levels: [{
+          level: 0, format: "bullet", text: "•", alignment: AlignmentType.LEFT,
+          style: { paragraph: { indent: { left: 425, hanging: 425 } } },
+        }],
       }],
-    }],
-  },
-  styles: { default: { document: { run: { font: FONT, size: 24 } } } },
-  sections: [{
-    properties: {
-      page: { margin: { top: 1134, bottom: 1134, left: 1701, right: 851 } },
     },
-    children,
-  }],
-});
+    styles: { default: { document: { run: { font: FONT, size: 24 } } } },
+    sections: [{
+      properties: {
+        page: { margin: { top: 1134, bottom: 1134, left: 1701, right: 851 } },
+      },
+      children,
+    }],
+  });
+}
 
-Packer.toBuffer(doc).then((buf) => {
+Packer.toBuffer(buildDoc()).then((buf) => {
   fs.writeFileSync("Дорогами-духовности-сайт.docx", buf);
   console.log("OK: Дорогами-духовности-сайт.docx,", buf.length, "bytes");
 });
