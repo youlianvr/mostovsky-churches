@@ -4,3 +4,6 @@ Thumbs.db
 
 # временные файлы research
 .research/
+
+# npm-зависимости генератора записки
+node_modules/
