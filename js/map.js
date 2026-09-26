@@ -44,51 +44,12 @@
       '</g>';
   }
 
-  /* Ярлык сидит на своей линии: стартуем с заданной доли длины и идём
-   * по цепочке, пока точка не окажется внутри кадра и подальше от нитки
-   * маршрута (ярлык не должен читаться как подпись нитки). */
-  var REF_AT = { "М6": 0.62, "Р41": 0.95, "Р44": 0.4 };
-
-  function refLabelAt(chains, fraction) {
-    var chain = chains[0];
-    if (!chain || !chain.length) { return null; }
-    var start = Math.floor(chain.length * fraction);
-    for (var d = 0; d < chain.length; d++) {
-      var idx = start + (d % 2 === 0 ? d / 2 : -(d + 1) / 2);
-      if (idx < 0 || idx >= chain.length) { continue; }
-      var p = G.project(chain[idx][1], chain[idx][0]);
-      /* У верхней кромки кадра проходит М6: пускаем туда подпись под линией. */
-      var inFrame = p.x > 50 && p.x < G.W - 50 && p.y > 8 && p.y < G.H - 30;
-      if (!inFrame) { continue; }
-      var nearRoute = G.ROUTE_ROADS.some(function (leg) {
-        return leg.some(function (q) {
-          var r = G.project(q[1], q[0]);
-          return Math.abs(r.x - p.x) < 22 && Math.abs(r.y - p.y) < 14;
-        });
-      });
-      if (!nearRoute) { p.below = p.y < 34; return p; }
-    }
-    return null;
-  }
-
-  function roadRefLabels() {
-    /* М6 в кадр не входит (проходит севернее района) — не рисуем и не подписываем. */
-    var refs = [[G.R41, "Р41"], [G.R44, "Р44"]];
-    return refs.map(function (item) {
-      var chains = item[0].slice().sort(function (a, b) { return b.length - a.length; });
-      var p = refLabelAt(chains, REF_AT[item[1]] || 0.5);
-      if (!p) { return ""; }
-      var ly = p.below ? p.y + 16 : p.y - 6;
-      return '<text class="map-road-ref" x="' + (p.x + 6).toFixed(1) + '" y="' + ly.toFixed(1) + '">' + item[1] + '</text>';
-    }).join("");
-  }
-
   function legendHtml() {
     return '<div class="legend">' +
       '<span class="legend-item">' + H.icon("legend-icon") +
       '<span>остановка маршрута: иконка церкви с номером шага</span></span>' +
       '<span class="legend-item"><span class="legend-route"></span><span>нитка маршрута по дорогам</span></span>' +
-      '<span class="legend-item"><span class="legend-road"></span><span>автодороги, Р41 · Р44</span></span>' +
+      '<span class="legend-item"><span class="legend-road"></span><span>автодороги</span></span>' +
       '<span class="legend-item"><span class="legend-rail"></span><span>железная дорога</span></span>' +
       '</div>';
   }
@@ -127,7 +88,6 @@
     var riverAnchor = G.project(53.478, 24.34);
     return '<g class="map-labels" pointer-events="none">' +
       '<text class="map-water-label" x="' + riverAnchor.x.toFixed(1) + '" y="' + (riverAnchor.y - 10).toFixed(1) + '">р. Неман</text>' +
-      roadRefLabels() +
       placeLabels() +
       routeEntryLabel() +
       '</g>';

@@ -802,17 +802,6 @@ a:hover { color: var(--color-ochre-deep); }
   stroke-linecap: round;
 }
 
-.map-road-ref {
-  fill: #8a7a55;
-  font-size: 13px;
-  font-weight: bold;
-  font-family: var(--font-sans, sans-serif);
-  paint-order: stroke;
-  stroke: #faf5e6;
-  stroke-width: 4;
-  stroke-linejoin: round;
-}
-
 .map-town-dot {
   fill: #7a2e1d;
   stroke: #fff;
