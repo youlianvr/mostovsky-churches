@@ -23,9 +23,13 @@ CHURCHES.forEach(function (church) {
   /* «Логистика»: расстояния от районного и областного центра. */
   check(church.logistics && church.logistics.fromGrodno && church.logistics.fromGrodno.road, prefix + "distance from Grodno required");
   check(church.logistics && church.logistics.fromMosty && church.logistics.fromMosty.road, prefix + "distance from Mosty required");
-  /* «Справочная информация»: контакты настоятеля и пункты питания. */
-  check(text(church.rector), prefix + "rector required");
-  check(text(church.phone) && /^[+\d][\d\s\-()]{6,}$/.test(church.phone), prefix + "phone must look like a real number");
+  /* «Справочная информация»: контакты настоятеля — парой или никак (у Дубно их
+   * нет: настоятель умер, пункт не упоминаем, решение владельца 2026-09-26). */
+  check(!!church.rector === !!church.phone, prefix + "rector and phone are published together or not at all");
+  if (church.phone) {
+    check(text(church.rector), prefix + "the rector must be named beside the phone");
+    check(/^[+\d][\d\s\-()]{6,}$/.test(church.phone), prefix + "phone must look like a real number");
+  }
   check(text(church.services), prefix + "service schedule required");
   check(text(church.gettingThere), prefix + "getting-there text required");
   check(text(church.food), prefix + "food note required");

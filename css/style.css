@@ -461,6 +461,13 @@ a:hover { color: var(--color-ochre-deep); }
 /* ---------- Главная: hero и список маршрута ---------- */
 .hero {
   padding: var(--space-lg) 0 var(--space-md);
+  /* Силуэт храма на фоне главной: контур снят с реального фото
+   * (img/photos/dubno-nikolaya.jpg → img/photos/hero-church.png), прозрачность
+   * запечена в файл, поэтому текст сохраняет обычную контрастность. */
+  background-image: url("../img/photos/hero-church.png");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: min(620px, 68%);
 }
 .eyebrow {
   margin-bottom: var(--space-xs);

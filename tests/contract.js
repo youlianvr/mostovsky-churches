@@ -191,12 +191,20 @@ check(BUS.checked && appEl.innerHTML.indexOf(H.escape(BUS.checked)) !== -1,
 section("spravka").render();
 ROUTE.forEach(function (slug) {
   var church = find(slug);
-  check(appEl.innerHTML.indexOf(H.escape(church.rector)) !== -1, slug + ": rector name required");
-  check(appEl.innerHTML.indexOf('href="tel:' + church.phone.replace(/[^+\d]/g, "") + '"') !== -1,
-    slug + ": a dialable parish phone is required");
+  check(appEl.innerHTML.indexOf(H.escape(church.name)) !== -1, slug + ": parish card required");
+  if (church.phone) {
+    check(appEl.innerHTML.indexOf(H.escape(church.rector)) !== -1, slug + ": rector name required");
+    check(appEl.innerHTML.indexOf('href="tel:' + church.phone.replace(/[^+\d]/g, "") + '"') !== -1,
+      slug + ": a dialable parish phone is required");
+  } else {
+    check(appEl.innerHTML.indexOf(H.escape(church.address)) !== -1,
+      slug + ": a parish without published contacts must still show its address");
+  }
   check(appEl.innerHTML.indexOf(H.escape(church.services)) !== -1,
     slug + ": service schedule required on the reference page");
 });
+check(count(appEl.innerHTML, 'href="tel:') === ROUTE.filter(function (slug) { return find(slug).phone; }).length,
+  "the reference page must render exactly the published parish phones");
 check(appEl.innerHTML.indexOf("Питание") !== -1 && FOOD.places.every(function (place) {
   return appEl.innerHTML.indexOf(H.escape(place.name)) !== -1 && appEl.innerHTML.indexOf(H.escape(place.address)) !== -1;
 }), "reference must list real places to eat");

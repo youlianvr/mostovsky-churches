@@ -74,7 +74,7 @@
       '<p class="page-lead">Схема маршрута на реальной географии: границы района, Нёман и дороги — данные OpenStreetMap.</p>' +
       '<section class="map-schema" aria-label="Схема маршрута"></section>' +
       '<section><h2>Объекты на схеме</h2><ol class="route-list">' + list + "</ol></section>" +
-      '<p class="data-note">Граница района, Нёман и дороги — реальные данные OpenStreetMap (схема не заменяет навигатор). Точные координаты каждого храма открываются кнопками «Открыть на Яндекс.Картах» на странице храма.</p>' +
+      '<p class="data-note">Граница района, Нёман и дороги — реальные данные OpenStreetMap. Точные координаты каждого храма открываются кнопками «Открыть на Яндекс.Картах» на странице храма.</p>' +
       sectionNavHtml("map"),
       "Карта-схема — Храмы Мостовского района");
     var schema = document.querySelector(".map-schema");
@@ -174,20 +174,30 @@
       '<p class="data-note">Незакрытые пункты завершает автор проекта: запись беседы собирается во время поездки.</p></section>';
   }
 
+  /* Карточка прихода: контакты настоятеля показываем только там, где они есть
+   * в данных (у Дубно их нет по решению владельца — настоятель умер, пункт не
+   * упоминаем). Про питание на карточках молчим: для этого есть раздел
+   * «Питание», иначе одна и та же фраза повторяется трижды. */
   function renderSpravka() {
     var contacts = ROUTE.map(function (slug, index) {
       var c = church(slug);
-      var tel = '<a href="tel:' + H.escape(c.phone.replace(/[^+\d]/g, "")) + '">' + H.escape(c.phone) + "</a>";
+      var hasRector = !!(c.rector && c.phone);
+      var rectorRow = hasRector
+        ? "<dt>Настоятель</dt><dd>" + H.escape(c.rector) + "</dd>"
+        : "";
+      var phoneRow = hasRector
+        ? '<dt>Телефон</dt><dd><a href="tel:' + H.escape(c.phone.replace(/[^+\d]/g, "")) + '">' +
+          H.escape(c.phone) + "</a></dd>"
+        : "";
       return H.stopCard({
         index: index,
         title: c.name,
         meta: c.settlement,
-        body: '<dl class="fact-panel"><dt>Настоятель</dt><dd>' + H.escape(c.rector) + "</dd>" +
-          "<dt>Телефон</dt><dd>" + tel + "</dd>" +
+        body: '<dl class="fact-panel">' + rectorRow + phoneRow +
           "<dt>Адрес</dt><dd>" + H.escape(c.address) + "</dd>" +
           "<dt>Богослужения</dt><dd>" + H.escape(c.services) + "</dd>" +
           (c.parishNote ? "<dt>Приход</dt><dd>" + H.escape(c.parishNote) + "</dd>" : "") +
-          "<dt>Питание</dt><dd>" + H.escape(c.food) + "</dd></dl>" +
+          "</dl>" +
           '<p><a class="btn btn-ghost" href="#/' + c.slug + '">Страница храма</a></p>'
       });
     }).join("");
