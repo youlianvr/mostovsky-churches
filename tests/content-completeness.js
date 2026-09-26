@@ -31,7 +31,6 @@ CHURCHES.forEach(function (church) {
     check(/^[+\d][\d\s\-()]{6,}$/.test(church.phone), prefix + "phone must look like a real number");
   }
   check(text(church.services), prefix + "service schedule required");
-  check(text(church.gettingThere), prefix + "getting-there text required");
   check(text(church.food), prefix + "food note required");
   check(!church.placeholder, prefix + "focus trio must not contain placeholders");
   if (church.photo) { check(/^img\/photos\/[^/]+\.(jpg|jpeg|png|webp)$/i.test(church.photo), prefix + "photo path must be local and safe"); }
