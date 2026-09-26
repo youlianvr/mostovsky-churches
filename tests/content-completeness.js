@@ -29,8 +29,6 @@ CHURCHES.forEach(function (church) {
   check(text(church.services), prefix + "service schedule required");
   check(text(church.gettingThere), prefix + "getting-there text required");
   check(text(church.food), prefix + "food note required");
-  /* «Фотоотчёт»: слоты личных фотографий — массив есть всегда, заполняется поездкой. */
-  check(Array.isArray(church.visitPhotos), prefix + "visitPhotos must be an array (empty before the trip)");
   check(!church.placeholder, prefix + "focus trio must not contain placeholders");
   if (church.photo) { check(/^img\/photos\/[^/]+\.(jpg|jpeg|png|webp)$/i.test(church.photo), prefix + "photo path must be local and safe"); }
   if (church.needsLicenseReview) {
@@ -47,8 +45,7 @@ check(new Set(shortNames).size === CHURCHES.length, "shortName values must be un
 check(Array.isArray(FOOD.places) && FOOD.places.length >= 1 && FOOD.places.every(function (p) { return text(p.name) && text(p.address); }),
   "reference information must list real places to eat");
 var approx = CHURCHES.filter(function (church) { return church.coordsNote; });
-var visitReady = CHURCHES.filter(function (church) { return church.visitPhotos.length > 0; });
-console.log("content contract v4 (block1-trio) | objects:", CHURCHES.length, "| approx:", approx.length,
+console.log("content contract v5 (block1-trio) | objects:", CHURCHES.length, "| approx:", approx.length,
   "| placeholders:", CHURCHES.filter(function (c) { return c.placeholder; }).length,
-  "| personal photos added:", visitReady.length, "| PROBLEMS:", problems.length ? problems : "none");
+  "| PROBLEMS:", problems.length ? problems : "none");
 process.exit(problems.length ? 1 : 0);

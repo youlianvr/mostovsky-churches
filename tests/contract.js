@@ -88,9 +88,9 @@ fire("DOMContentLoaded");
 check(appEl.innerHTML.indexOf("Остановки маршрута") !== -1, "empty hash must dispatch to the itinerary");
 check(document.title === "Нитка маршрута — Храмы Мостовского района", "itinerary must own the tab title");
 window.location.hash = "#/foto";
-fire("hashchange");           /* the redirect itself */
-fire("hashchange");           /* the browser fires hashchange once more for the new hash */
-check(document.title.indexOf("Рождества Пресвятой Богородицы") !== -1, "#/foto must redirect to the first church page with its photo report");
+fire("hashchange");
+check(document.title.indexOf("не найдена") !== -1,
+  "#/foto must stop redirecting now that the photo report is gone");
 window.location.hash = "#/lunno-predtechi";
 fire("hashchange");
 check(document.title.indexOf("Иоанна Предтечи") !== -1, "a church slug must dispatch to its page");
@@ -117,7 +117,8 @@ sections.forEach(function (item) {
 section("").render();
 check(count(appEl.innerHTML, 'class="route-name"') === 3, "itinerary must list 3 stops");
 check(count(appEl.innerHTML, "stop-icon") === 3, "each stop needs the church icon");
-check(appEl.innerHTML.indexOf("Перегоны") !== -1, "itinerary must show the legs between stops");
+check(appEl.innerHTML.indexOf("<h1>Дорогами духовности</h1>") !== -1,
+  "the itinerary must carry the project title as its heading");
 
 /* --- map schema: church icon per stop, one route line, no clusters --- */
 section("map").render();
@@ -142,14 +143,14 @@ check((appEl.innerHTML + mapBox.innerHTML).indexOf("openstreetmap.org/copyright"
 /* --- description: historical note and the appeal of every object --- */
 section("opis").render();
 check(count(appEl.innerHTML, 'class="stop-appeal"') === 3, "opis must state the appeal of each object");
-check(appEl.innerHTML.indexOf("Почему этот маршрут привлекателен") !== -1, "opis must argue the route appeal");
+check(appEl.innerHTML.indexOf("Привлекательность маршрута") !== -1, "opis must argue the route appeal");
 ROUTE.forEach(function (slug) {
   check(appEl.innerHTML.indexOf(H.escape(find(slug).appeal)) !== -1, slug + ": appeal text must reach the page");
 });
 
 /* --- logistics: travel modes and distances from both centres --- */
 section("logistika").render();
-check(appEl.innerHTML.indexOf("От Гродно") !== -1 && appEl.innerHTML.indexOf("От Мостов") !== -1,
+check(appEl.innerHTML.indexOf("<th>Гродно</th>") !== -1 && appEl.innerHTML.indexOf("<th>Мосты</th>") !== -1,
   "logistics must give distances from the regional and the district centre");
 ["Автомобилем", "Автобусом", "Пешком"].forEach(function (mode) {
   check(appEl.innerHTML.indexOf("<strong>" + mode) !== -1, "logistics must describe " + mode);
@@ -175,8 +176,8 @@ BUS_STOPS.forEach(function (entry) {
   check(appEl.innerHTML.indexOf(H.escape(church.settlement) + " — " + H.escape(entry.stop)) !== -1,
     entry.slug + ": the bus stop must be named on the page");
   entry.trips.forEach(function (trip) {
-    check(appEl.innerHTML.indexOf(H.escape(trip.routes)) !== -1 && appEl.innerHTML.indexOf(H.escape(trip.times)) !== -1,
-      entry.slug + ": route numbers and times must reach the page — " + trip.to);
+    check(appEl.innerHTML.indexOf(H.escape(trip.to)) !== -1 && appEl.innerHTML.indexOf(H.escape(trip.times)) !== -1,
+      entry.slug + ": destination and times must reach the page — " + trip.to);
   });
   check(appEl.innerHTML.indexOf(H.escape(entry.toChurch)) !== -1,
     entry.slug + ": the walk from the stop to the church must be stated");
@@ -193,29 +194,23 @@ ROUTE.forEach(function (slug) {
   check(appEl.innerHTML.indexOf(H.escape(church.rector)) !== -1, slug + ": rector name required");
   check(appEl.innerHTML.indexOf('href="tel:' + church.phone.replace(/[^+\d]/g, "") + '"') !== -1,
     slug + ": a dialable parish phone is required");
+  check(appEl.innerHTML.indexOf(H.escape(church.services)) !== -1,
+    slug + ": service schedule required on the reference page");
 });
-check(appEl.innerHTML.indexOf("Где поесть") !== -1 && FOOD.places.every(function (place) {
+check(appEl.innerHTML.indexOf("Питание") !== -1 && FOOD.places.every(function (place) {
   return appEl.innerHTML.indexOf(H.escape(place.name)) !== -1 && appEl.innerHTML.indexOf(H.escape(place.address)) !== -1;
 }), "reference must list real places to eat");
 check(count(appEl.innerHTML, 'class="source-check') >= 5, "reference must show at least five sources");
 
-/* --- photo report on each church page: one honest empty slot per frame,
- * fillable from data --- */
+/* --- photo report removed by owner decision (2026-09-26): no church page
+ * may carry its slots or its label --- */
 ROUTE.forEach(function (slug) {
-  var church = find(slug);
-  window.ChurchPage.render(church);
-  check(count(appEl.innerHTML, 'class="report-slot"') === PHOTO_REPORT.kinds.length,
-    slug + ": page must offer " + PHOTO_REPORT.kinds.length + " photo slots");
-  check(count(appEl.innerHTML, "is-filled") === 0, slug + ": empty slots must not claim photos before the trip");
-  check(appEl.innerHTML.indexOf("Фото добавляется") !== -1, slug + ": empty slots must be labelled honestly");
+  window.ChurchPage.render(find(slug));
+  check(appEl.innerHTML.indexOf("report-slot") === -1 && appEl.innerHTML.indexOf("Фотоотчёт") === -1,
+    slug + ": photo report must be gone from the church page");
 });
-find(TRIO[0]).visitPhotos.unshift({ src: "img/photos/visit/test.jpg", credit: "фото автора" });
-window.ChurchPage.render(find(TRIO[0]));
-check(count(appEl.innerHTML, "report-slot is-filled") === 1 &&
-  appEl.innerHTML.indexOf('src="img/photos/visit/test.jpg"') !== -1, "a data row must fill its slot");
-find(TRIO[0]).visitPhotos.shift();
 
-/* --- church page: facts, both map links, visiting info, neighbours --- */
+/* --- church page: facts, both map links, parish info, neighbours --- */
 ROUTE.forEach(function (slug) {
   var church = find(slug);
   window.ChurchPage.render(church);
@@ -223,8 +218,8 @@ ROUTE.forEach(function (slug) {
   check(appEl.innerHTML.indexOf(H.escape(church.appeal)) !== -1, slug + ": page must state why to visit");
   check(count(appEl.innerHTML, 'class="locator-map"') === 1, slug + ": district locator required");
   check(count(appEl.innerHTML, "locator-icon") === 3, slug + ": locator must show all three stops");
-  check(appEl.innerHTML.indexOf(H.escape(church.logistics.bus)) !== -1, slug + ": the page must repeat its bus line");
-  check(appEl.innerHTML.indexOf(H.escape(church.services)) !== -1, slug + ": service schedule required");
+  check(appEl.innerHTML.indexOf("Как добраться") === -1,
+    slug + ": the church page must not repeat the logistics block");
   var links = window.ChurchPage.buildMapLinks(church);
   check(links.yandex === "https://yandex.ru/maps/?pt=" + church.coords.lon + "," + church.coords.lat + "&z=17",
     slug + ": Yandex link must carry lon,lat");
@@ -257,7 +252,7 @@ check(error && error.message.indexOf("lunno-predtechi") !== -1,
   "reordered ROUTE must be reported against the object found by slug, got: " + (error && error.message));
 check(dataError(dataSource) === null, "the shipped data must pass its own integrity rule");
 
-console.log("contract v7 (block1-trio, modular, photo-on-church-pages) | modules:", modules.join(" → "));
+console.log("contract v8 (block1-trio, modular, photo-report-removed) | modules:", modules.join(" → "));
 console.log("sections:", sections.length, "| stops:", ROUTE.length, "| markers:", count(schema, 'class="map-marker-g"'));
 console.log("PROBLEMS:", problems.length ? problems : "none");
 process.exit(problems.length ? 1 : 0);

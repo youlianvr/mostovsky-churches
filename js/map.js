@@ -104,7 +104,7 @@
     for (var i = 0; i < leg.length; i++) {
       if (G.pointInDistrict(leg[i][0], leg[i][1])) {
         var p = G.project(leg[i][1], leg[i][0]);
-        return '<text class="map-entry-label" x="' + (p.x + 8).toFixed(1) + '" y="' + (p.y - 8).toFixed(1) + '">из Гродно →</text>';
+        return '<text class="map-entry-label" x="' + (p.x + 8).toFixed(1) + '" y="' + (p.y - 8).toFixed(1) + '">г. Гродно →</text>';
       }
     }
     return "";

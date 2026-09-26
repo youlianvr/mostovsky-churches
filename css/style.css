@@ -499,6 +499,14 @@ a:hover { color: var(--color-ochre-deep); }
 }
 .hero p { max-width: 60ch; }
 
+/* Строка нитки маршрута под крупным заголовком главной: не конкурирует
+ * с названием проекта, но сразу называет порядок остановок. */
+.hero-route {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h2);
+  color: var(--color-green-deep);
+}
+
 .route-name {
   font-family: var(--font-serif);
   font-weight: bold;

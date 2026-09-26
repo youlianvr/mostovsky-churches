@@ -22,7 +22,7 @@ const { chromium } = require("playwright");
 
   await page.goto(base + "#/", { waitUntil: "networkidle" });
   check(await page.locator(".route-list li").count() === 3, "route page must list three stops");
-  check((await page.locator("h1").textContent()).includes("Гудевичи"), "route headline must name the itinerary");
+  check((await page.locator("h1").textContent()).includes("Дорогами духовности"), "route headline must be the project title");
 
   /* Каждый отдел Блока 1 открывается по своему адресу и даёт заголовок. */
   for (const [route, label] of SECTIONS) {
@@ -56,21 +56,15 @@ const { chromium } = require("playwright");
   check(await page.locator(".stop-card").count() === 3, "reference page must show three parish cards");
   check(await page.locator(".source-check").count() >= 5, "reference page must list at least five sources");
 
-  /* Фотоотчёт: честные пустые слоты на странице каждого храма. */
+  /* Фотоотчёт убран решением владельца (2026-09-26): слотов на страницах нет. */
   for (const slug of ["gudevichi-rozhdestva", "lunno-predtechi", "dubno-nikolaya"]) {
     await page.goto(base + "#/" + slug, { waitUntil: "networkidle" });
-    check(await page.locator(".report-slot").count() === 2, slug + ": photo report must render its slots on the church page");
-    check(await page.locator(".report-slot.is-filled").count() === 0, slug + ": slots stay empty until personal photos exist");
+    check(await page.locator(".report-slot").count() === 0, slug + ": photo report must be gone");
   }
-
-  /* Устаревший адрес #/foto ведёт на страницу первого храма. */
-  await page.goto(base + "#/foto", { waitUntil: "networkidle" });
-  await page.waitForFunction(() => location.hash === "#/gudevichi-rozhdestva");
-  check((await page.locator("h1").textContent()).includes("Рождества"), "old #/foto address must redirect to the first church page");
 
   await page.goto(base + "#/does-not-exist", { waitUntil: "networkidle" });
   check((await page.locator("h1").textContent()).trim() === "Храм не найден", "unknown slug must render 404");
   check(errors.length === 0, "browser console errors: " + errors.join(" | "));
   await browser.close();
-  console.log("browser contract v4 | five sections, photo report on church pages, icon markers, navigation, map links, 404: PASS");
+  console.log("browser contract v5 | five sections, icon markers, navigation, map links, 404: PASS");
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });

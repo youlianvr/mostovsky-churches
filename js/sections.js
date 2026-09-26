@@ -35,27 +35,14 @@
         action: '<a class="btn btn-ghost" href="#/' + c.slug + '">Открыть описание</a>'
       });
     }).join("");
-    var legs = H.table(["№", "Участок", "Способ", "Расстояние", "Время"], ROUTE_LEGS.map(legCells));
     H.paint('<section class="hero">' +
-      '<p class="eyebrow">Блок 1 · Дорогами духовности</p>' +
-      '<h1>Нитка маршрута: Гродно → Гудевичи → Лунно → Дубно → Мосты</h1>' +
+      '<h1>Дорогами духовности</h1>' +
+      '<p class="hero-route">Нитка маршрута: Гродно → Гудевичи → Лунно → Дубно → Мосты</p>' +
       '<p>Три сельские церкви XIX века в Мостовском районе Гродненской области: Гудевичи (1852), Лунно (1889) и Дубно (1844). Маршрут начинается в Гродно и идёт с запада на восток: от шатровой колокольни Гудевичей к «крепостному» храму Лунно и дальше к самому крупному храму тройки в Дубно, а заканчивается в Мостах — районном центре.</p>' +
-      '<p class="hero-guide"><strong>С чего начать:</strong> посмотрите <a href="#/map">карту-схему</a>, затем откройте <a href="#/opis">описание</a> каждой остановки.</p></section>' +
+      "</section>" +
       '<section><h2>Остановки маршрута</h2><ol class="route-list">' + stops + "</ol></section>" +
-      '<section><h2>Перегоны</h2>' + legs +
-      '<p class="data-note">Расстояния — маршруты OpenStreetMap; время в пути — оценка, пешее посчитано по 4,5 км/ч. Подробнее — в разделе <a href="#/logistika">«Логистика»</a>.</p></section>' +
       sectionNavHtml(""),
       "Нитка маршрута — Храмы Мостовского района");
-  }
-
-  function legCells(leg, index) {
-    return [
-      "" + (index + 1),
-      H.escape(leg.from) + " → " + H.escape(leg.toSettlement),
-      H.escape(leg.mode),
-      H.escape(leg.road),
-      H.escape(leg.time) + (leg.walk ? '<br><span class="cell-note">' + H.escape(leg.walk) + "</span>" : "")
-    ];
   }
 
   /* ---------- 2. Карта-схема ---------- */
@@ -84,7 +71,7 @@
       });
     }).join("");
     H.paint('<h1>Карта-схема маршрута</h1>' +
-      '<p class="page-lead">Схема маршрута на реальной географии: границы района, Нёман и дороги — данные OpenStreetMap; красная пунктирная нить — путь маршрута по автодорогам от Гродно через Гудевичи и Лунно к Дубно и Мостам. Номер у иконки — шаг маршрута, клик по иконке открывает страницу храма.</p>' +
+      '<p class="page-lead">Схема маршрута на реальной географии: границы района, Нёман и дороги — данные OpenStreetMap.</p>' +
       '<section class="map-schema" aria-label="Схема маршрута"></section>' +
       '<section><h2>Объекты на схеме</h2><ol class="route-list">' + list + "</ol></section>" +
       '<p class="data-note">Граница района, Нёман и дороги — реальные данные OpenStreetMap (схема не заменяет навигатор). Точные координаты каждого храма открываются кнопками «Открыть на Яндекс.Картах» на странице храма.</p>' +
@@ -108,12 +95,12 @@
         body: '<p class="stop-appeal">' + H.escape(c.appeal) + "</p>" +
           "<p>" + H.escape(c.history[0]) + '</p><ul class="facts-list">' + facts + "</ul>" +
           '<p><a class="btn btn-ghost" href="#/' + c.slug + '">Подробная страница храма</a>' +
-          ' <a class="btn btn-ghost" href="#/logistika">Как добраться</a></p>'
+          ' <a class="btn btn-ghost" href="#/logistika">Логистика маршрута</a></p>'
       });
     }).join("");
     H.paint('<h1>Описание маршрута</h1>' +
       '<p class="page-lead">Текстовая часть проекта: краткая историческая справка по каждому объекту и обоснование привлекательности маршрута.</p>' +
-      '<section class="card"><h2>Почему этот маршрут привлекателен</h2>' + paragraphs(ROUTE_APPEAL) + "</section>" +
+      '<section class="card"><h2>Привлекательность маршрута</h2>' + paragraphs(ROUTE_APPEAL) + "</section>" +
       '<section><h2>Остановки: историческая справка</h2><div class="stop-cards">' + cards + "</div></section>" +
       sectionNavHtml("opis"),
       "Описание — Храмы Мостовского района");
@@ -134,15 +121,14 @@
     var blocks = BUS_STOPS.map(function (entry) {
       var c = church(entry.slug);
       var trips = entry.trips.map(function (trip) {
-        return "<dt>" + H.escape(trip.to) + "</dt><dd>" + H.escape(trip.routes) +
-          '<br><span class="cell-note">' + H.escape(trip.times) + "</span></dd>";
+        return "<dt>" + H.escape(trip.to) + "</dt><dd>" + H.escape(trip.times) + "</dd>";
       }).join("");
       return '<article class="card"><h3>' + H.escape(c.settlement) + " — " + H.escape(entry.stop) + "</h3>" +
         '<dl class="bus-trips">' + trips + "</dl>" +
         '<p class="data-note">' + H.escape(entry.toChurch) + ". Номер остановки в приложении «Транспорт BY»: " + H.escape(entry.stopId) + ".</p></article>";
     }).join("");
     return '<section><h2>Автобусы у остановок маршрута</h2>' +
-      '<p class="page-lead">Время указано для самой остановки, дни недели — по расписанию областного оператора пассажирских перевозок; номера рейсов в приложении «Транспорт BY» могут отличаться.</p>' +
+      '<p class="page-lead">Время указано для самой остановки, дни недели — по расписанию областного оператора пассажирских перевозок.</p>' +
       blocks +
       '<p class="data-note">Расписания остановок опубликованы на сайте перевозчика (ГП «Оператор пассажирских перевозок», файлы по маршрутам Мостовского района), маршруты и время сверены по приложению «Транспорт BY» ' +
       H.escape(BUS.checked) + ". Рейсы ходят не каждый день: перед поездкой подтверждайте отправление в кассе или по телефону.</p></section>";
@@ -159,11 +145,9 @@
     });
     H.paint('<h1>Логистика маршрута</h1>' +
       '<p class="page-lead">Способы передвижения и расстояния до каждой остановки — от Гродно (областной центр) и от Мостов (районный центр).</p>' +
-      '<section><h2>Сколько ехать до каждого храма</h2>' +
-      H.table(["Остановка", "От Гродно (центр)", "От Мостов (центр)"], rows) +
+      '<section><h2>Время</h2>' +
+      H.table(["Остановка", "Гродно", "Мосты"], rows) +
       '<p class="data-note">Расстояния — по дорожным маршрутам OpenStreetMap от центров городов; время на автомобиле — оценка без учёта остановок и погоды. От автовокзала Гродно (ул. Ожешко, 25) путь длиннее: до Гудевичей около 59 км. На телефоне таблицу можно прокрутить вбок.</p></section>' +
-      "<section><h2>Перегоны между остановками</h2>" +
-      H.table(["№", "Участок", "Способ", "Расстояние", "Время"], ROUTE_LEGS.map(legCells)) + "</section>" +
       '<section class="card"><h2>Где начинается маршрут: автовокзал Гродно и автостанция «Мосты»</h2>' +
       '<div class="stop-cards">' + hubCard(BUS.grodno) + hubCard(BUS.mosty) + "</div>" +
       "<p>" + H.escape(BUS.note) + "</p>" +
@@ -217,7 +201,7 @@
     H.paint('<h1>Справочная информация</h1>' +
       '<p class="page-lead">Контакты приходов, расписание богослужений и ближайшие пункты питания — всё, что нужно знать перед поездкой.</p>' +
       '<section><h2>Приходы и контакты</h2><div class="stop-cards">' + contacts + "</div></section>" +
-      '<section class="card"><h2>Где поесть</h2><p>' + H.escape(FOOD.note) + '</p><ul class="facts-list">' + places + "</ul>" +
+      '<section class="card"><h2>Питание</h2><p>' + H.escape(FOOD.note) + '</p><ul class="facts-list">' + places + "</ul>" +
       '<p class="data-note">' + H.escape(FOOD.source) + "</p></section>" +
       sourceChecklistHtml() + sectionNavHtml("spravka"),
       "Справочная информация — Храмы Мостовского района");
