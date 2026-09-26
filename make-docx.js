@@ -4,6 +4,7 @@
  * Данные читаются из js/data.js — единого источника, как на сайте. */
 const fs = require("fs");
 const vm = require("vm");
+const crypto = require("crypto");
 const {
   Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType,
   Table, TableRow, TableCell, WidthType, ShadingType, ImageRun,
@@ -16,18 +17,23 @@ const sandbox = { console };
 vm.createContext(sandbox);
 vm.runInContext(
   fs.readFileSync("js/data.js", "utf8") +
-  ";this.CHURCHES=CHURCHES;this.ROUTE=ROUTE;this.ROUTE_LEGS=ROUTE_LEGS;" +
+  ";this.CHURCHES=CHURCHES;this.ROUTE=ROUTE;" +
   "this.ROUTE_APPEAL=ROUTE_APPEAL;this.TRANSPORT_MODES=TRANSPORT_MODES;" +
-  "this.BUS=BUS;this.BUS_STOPS=BUS_STOPS;this.FOOD=FOOD;this.SOURCES=SOURCES;" +
-  "this.PHOTO_REPORT=PHOTO_REPORT;",
+  "this.BUS=BUS;this.BUS_STOPS=BUS_STOPS;this.FOOD=FOOD;this.SOURCES=SOURCES;",
   sandbox
 );
 const {
-  CHURCHES, ROUTE, ROUTE_LEGS, ROUTE_APPEAL, TRANSPORT_MODES,
-  BUS, BUS_STOPS, FOOD, SOURCES, PHOTO_REPORT,
+  CHURCHES, ROUTE, ROUTE_APPEAL, TRANSPORT_MODES,
+  BUS, BUS_STOPS, FOOD, SOURCES,
 } = sandbox;
 const bySlug = Object.fromEntries(CHURCHES.map((c) => [c.slug, c]));
 const stops = ROUTE.map((s) => bySlug[s]);
+
+/* Та же строка, что в шапке сайта: собирается из данных, а не переписана
+ * руками, поэтому сайт и печатная версия не могут разойтись. */
+const shortPlace = (settlement) => String(settlement).replace(/^(?:г|д|аг)\.\s*/, "");
+const routeLine = () =>
+  "Нитка маршрута: Гродно → " + stops.map((c) => shortPlace(c.settlement)).join(" → ") + " → Мосты";
 
 /* --- помощники --- */
 const FONT = "Times New Roman";
@@ -116,6 +122,22 @@ function qrBlock(url, caption, sizePx = 130) {
 }
 /* QR генерируются синхронно на старте: qrcode.toBuffer асинхронен, поэтому
  * рисуем модули сами через синхронный QRCode.create и пишем PNG в буфер. */
+/* Карта для печати рисуется отдельным скриптом из тех же данных, что сайт.
+ * Если схему меняли позже картинки, сборка останавливается: печатать
+ * устаревшую схему нельзя. */
+const PARTS_FOR_SCHEMA = ["js/map.js", "js/map-geometry.js", "js/church-icon.js", "css/style.css"];
+const SCHEMA_PNG = "__docx-schema.png";
+if (!fs.existsSync(SCHEMA_PNG)) {
+  throw new Error("нет " + SCHEMA_PNG + " — сначала запустите node make-schema.js");
+}
+const schemaTime = fs.statSync(SCHEMA_PNG).mtimeMs;
+for (const part of PARTS_FOR_SCHEMA) {
+  const changed = fs.statSync(part).mtimeMs;
+  if (changed > schemaTime + 1000) {
+    throw new Error(part + " изменён позже " + SCHEMA_PNG + " — пересоберите схему: node make-schema.js");
+  }
+}
+
 const SITE = "https://youlianvr.github.io/mostovsky-churches/";
 const qrCache = (() => {
   const urls = [SITE, ...stops.map((c) => SITE + "#/" + c.slug)];
@@ -179,12 +201,14 @@ const children = [];
 
 /* ================= Титул ================= */
 children.push(
-  para(run("Конкурс «Гродненщина православная», Блок 1 «Дорогами духовности» (туристско-краеведческий)",
+  para(run("Конкурс «Гродненщина православная», туристско-краеведческий",
     { italics: true }), { alignment: AlignmentType.CENTER, spacing: { before: 2400, after: 240 } }),
   new Paragraph({
-    heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER, spacing: { after: 480 },
-    children: [run("«Дорогами духовности» — маршрут по храмам Мостовского района", { bold: true, size: 48 })],
+    heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER, spacing: { after: 240 },
+    children: [run("Дорогами духовности", { bold: true, size: 48 })],
   }),
+  para(run(routeLine(), { size: 30 }),
+    { alignment: AlignmentType.CENTER, spacing: { after: 480 } }),
   para([run("Руководитель проекта: ", { bold: true }), run("Величко Татьяна Фредьевна")],
     { alignment: AlignmentType.CENTER, spacing: { after: 60 } }),
   para([run("Разработчик сайта: ", { bold: true }), run("Юлиана Ступчика")],
@@ -214,29 +238,11 @@ for (let i = 0; i < stops.length; i++) {
     run(` — ${c.settlement} · ${c.built}`),
   ], { alignment: AlignmentType.LEFT, spacing: { after: 60 } }));
 }
-children.push(h3("Перегоны"));
-children.push(table(
-  [600, 2700, 1600, 1300, 3640],
-  ["№", "Участок", "Способ", "Расстояние", "Время"],
-  ROUTE_LEGS.map((l, i) => [
-    String(i + 1),
-    `${l.from} — ${l.toSettlement}`,
-    l.mode,
-    l.road,
-    l.walk ? `${l.time} / ${l.walk}` : l.time,
-  ]),
-));
-children.push(para(run(
-  "Расстояния — маршруты OpenStreetMap; время в пути — оценка, пешее посчитано по 4,5 км/ч.",
-  { italics: true, size: 20 }),
-  { spacing: { before: 100 } }));
 
 /* ================= 2. Карта-схема ================= */
 children.push(h1("2. Карта-схема"));
 children.push(para(run(
-  "Схема маршрута на реальной географии: границы района, Нёман и дороги — данные " +
-  "OpenStreetMap; красная пунктирная нить — путь маршрута по автодорогам от Гродно " +
-  "через Гудевичи и Лунно к Дубно и Мостам. Номер у иконки — шаг маршрута."
+  "Схема маршрута на реальной географии: границы района, Нёман и дороги — данные OpenStreetMap."
 )));
 children.push(new Paragraph({
   alignment: AlignmentType.CENTER, spacing: { before: 120, after: 40 },
@@ -247,11 +253,15 @@ children.push(new Paragraph({
 }));
 children.push(para(run(
   "Условные знаки: иконка церкви с номером шага — остановка маршрута; красный пунктир — " +
-  "нитка маршрута по дорогам; жёлтые линии — автодороги Р41 и Р44; штриховая чёрная — " +
-  "железная дорога; синяя линия — река Нёман. Геометрия района, реки и дорог, автопуть " +
-  "маршрута — © OpenStreetMap contributors (ODbL 1.0), маршрут — OSRM.",
+  "нитка маршрута по дорогам; жёлтые линии — автодороги; штриховая чёрная — железная " +
+  "дорога; синяя линия — река Неман. Геометрия района, реки и дорог, автопуть маршрута — " +
+  "© OpenStreetMap contributors (ODbL 1.0), маршрут — OSRM.",
   { italics: true, size: 20 }),
   { alignment: AlignmentType.CENTER }));
+children.push(para(run(
+  "Граница района, Нёман и дороги — реальные данные OpenStreetMap. Точные координаты " +
+  "каждого храма открываются кнопками «Открыть на Яндекс.Картах» на странице храма.",
+  { italics: true, size: 20 })));
 children.push(h3("Объекты на схеме"));
 for (let i = 0; i < stops.length; i++) {
   const c = stops[i];
@@ -264,7 +274,7 @@ for (let i = 0; i < stops.length; i++) {
 
 /* ================= 3. Описание ================= */
 children.push(h1("3. Описание"));
-children.push(h2("Почему этот маршрут привлекателен"));
+children.push(h2("Привлекательность маршрута"));
 for (const t of ROUTE_APPEAL) children.push(para(run(t)));
 children.push(h2("Остановки: историческая справка"));
 for (const c of stops) {
@@ -276,35 +286,28 @@ for (const c of stops) {
 }
 
 /* ================= 4. Логистика ================= */
-children.push(h1("4. Логистика"));
+children.push(h1("4. Логистика маршрута"));
 children.push(para(run(
   "Способы передвижения и расстояния до каждой остановки — от Гродно (областной центр) " +
-  "и от Мостов (районный центр). Расстояния — по дорожным маршрутам OpenStreetMap от " +
-  "центров городов; время на автомобиле — оценка без учёта остановок и погоды."
+  "и от Мостов (районный центр)."
 )));
-children.push(h3("Сколько ехать до каждого храма"));
+children.push(h3("Время"));
 children.push(table(
   [2800, 3520, 3520],
-  ["Остановка", "От Гродно (центр)", "От Мостов (центр)"],
+  ["Остановка", "Гродно", "Мосты"],
   stops.map((c, i) => [
     `${i + 1} · ${c.settlement}`,
     `${c.logistics.fromGrodno.road} (${c.logistics.fromGrodno.car} на машине)`,
     `${c.logistics.fromMosty.road} (${c.logistics.fromMosty.car} на машине)`,
   ]),
 ));
-children.push(h3("Перегоны между остановками"));
-children.push(table(
-  [600, 2700, 1600, 1300, 3640],
-  ["№", "Участок", "Способ", "Расстояние", "Время"],
-  ROUTE_LEGS.map((l, i) => [
-    String(i + 1),
-    `${l.from} — ${l.toSettlement}`,
-    l.mode,
-    l.road,
-    l.walk ? `${l.time} / ${l.walk}` : l.time,
-  ]),
-));
-children.push(h3("Где начинается маршрут"));
+children.push(para(run(
+  "Расстояния — по дорожным маршрутам OpenStreetMap от центров городов; время на " +
+  "автомобиле — оценка без учёта остановок и погоды. От автовокзала Гродно " +
+  "(ул. Ожешко, 25) путь длиннее: до Гудевичей около 59 км.",
+  { italics: true, size: 20 }),
+  { spacing: { before: 100 } }));
+children.push(h3("Где начинается маршрут: автовокзал Гродно и автостанция «Мосты»"));
 for (const key of ["grodno", "mosty"]) {
   const b = BUS[key];
   children.push(para([
@@ -326,8 +329,7 @@ for (const entry of BUS_STOPS) {
   for (const trip of entry.trips) {
     children.push(para([
       run(`${trip.to}: `, { bold: true }),
-      run(`${trip.routes} `),
-      run(`(${trip.times})`, { italics: true }),
+      run(trip.times),
     ], { alignment: AlignmentType.LEFT }));
   }
   children.push(para(run(`${entry.toChurch}. Номер остановки в приложении «Транспорт BY»: ${entry.stopId}.`,
@@ -345,20 +347,21 @@ children.push(h1("5. Справочная информация"));
 children.push(h2("Приходы и контакты"));
 for (const c of stops) {
   children.push(h3(`${c.name} — ${c.settlement}`));
-  children.push(para([
-    run("Настоятель: ", { bold: true }), run(`${c.rector}. `),
-    run("Телефон: ", { bold: true }), run(`${c.phone}. `),
-    run("Адрес: ", { bold: true }), run(`${c.address}. `),
-  ]));
+  /* Настоятель и телефон публикуются только парой: у Дубно их нет вовсе,
+   * поэтому строка не выводится, а не печатается пустой. */
+  const contactRow = c.rector && c.phone
+    ? [run("Настоятель: ", { bold: true }), run(`${c.rector}. `),
+       run("Телефон: ", { bold: true }), run(`${c.phone}. `)]
+    : [];
+  children.push(para([...contactRow, run("Адрес: ", { bold: true }), run(`${c.address}. `)]));
   children.push(para([
     run("Богослужения: ", { bold: true }), run(c.services),
   ]));
   if (c.parishNote) {
     children.push(para([run("Приход: ", { bold: true }), run(c.parishNote)]));
   }
-  children.push(para([run("Питание: ", { bold: true }), run(c.food)]));
 }
-children.push(h2("Где поесть"));
+children.push(h2("Питание"));
 children.push(para(run(FOOD.note)));
 for (const p of FOOD.places) {
   const tail = p.hours ? `, ${p.hours}` : "";
@@ -378,32 +381,17 @@ children.push(para(run(
   "Незакрытые пункты завершает автор проекта: запись беседы собирается во время поездки.",
   { italics: true, size: 20 })));
 
-/* ================= 6. Фотоотчёт + страницы храмов ================= */
-children.push(h1("6. Фотоотчёт о личном посещении"));
-children.push(para(run(PHOTO_REPORT.lead)));
-children.push(para(run(
-  "На интерактивном сайте блок фотоотчёта входит в страницу каждого храма: слоты " +
-  "заполняются после поездки, пока они честно пусты — чужие фотографии из интернета " +
-  "здесь не используются."
-)));
-children.push(para(run("Как заполняется:", { bold: true }), { spacing: { after: 40 } }));
-for (const step of PHOTO_REPORT.howto) children.push(bullet(step));
-children.push(para(run(PHOTO_REPORT.note, { italics: true, size: 20 })));
-
-children.push(h2("Страницы храмов"));
+/* ================= 6. Страницы храмов ================= */
+children.push(h1("6. Страницы храмов"));
 for (const c of stops) {
   children.push(h3(`${c.routeStep}. ${c.name} — ${c.settlement}`));
   children.push(...photo(c.photo, c.photoSize[0], c.photoSize[1], c.photoCredit));
   children.push(para([
     run("Чем привлекателен: ", { bold: true }), run(c.appeal),
   ]));
-  children.push(para([
-    run("Как добраться: ", { bold: true }), run(c.gettingThere),
-  ]));
-  const notes = [];
-  if (c.note) notes.push(c.note);
-  if (c.parishNote) notes.push(c.parishNote);
-  if (notes.length) children.push(para([run("Примечание: ", { bold: true }), run(notes.join(". "))]));
+  for (const paragraph of c.history) children.push(para(run(paragraph)));
+  children.push(para(run("Ключевые факты:", { bold: true }), { spacing: { after: 40 } }));
+  for (const fact of c.facts) children.push(bullet(fact));
   children.push(para(run("Источники по объекту:", { bold: true }), { spacing: { after: 40 } }));
   for (const s of c.sources) children.push(bullet(s));
   const churchUrl = SITE + "#/" + c.slug;
@@ -438,7 +426,87 @@ function buildDoc() {
   });
 }
 
+/* ------------------------------------------------------------------ проверка
+ * Собранный файл читается обратно и сверяется с сайтом. Печатная версия —
+ * это сайт на бумаге: если в ней снова появится убранный блок или чужое
+ * фото, сборка падает, а не выпускает расходящийся документ.
+ */
+
+const BANNED = [
+  "Блок 1", "Фотоотчёт", "Перегоны", "Как добраться", "Где поесть",
+  "Почему этот маршрут", "Сколько ехать до каждого храма",
+  "От Гродно (центр)", "От Мостов (центр)", "Остановка 1 из 3",
+  "Настоятель: протоиерей Николай Гляд", "тремя группами",
+];
+/* Заголовки, которые обязаны быть одинаковыми на сайте и в печати. */
+const MIRRORED = [
+  "Дорогами духовности", "Нитка маршрута",
+  "Схема маршрута на реальной географии", "Привлекательность маршрута",
+  "Остановки: историческая справка", "Логистика маршрута", "Время",
+  "Автобусы у остановок маршрута", "Способы передвижения",
+  "Справочная информация", "Приходы и контакты", "Питание",
+];
+const SITE_SOURCES = ["js/data.js", "js/sections.js", "js/church.js"]
+  .map((file) => fs.readFileSync(file, "utf8")).join("\n");
+
+function zipEntries(buf) {
+  const zlib = require("zlib");
+  const eocd = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  if (eocd === -1) { throw new Error("это не zip/docx: нет конца каталога"); }
+  const count = buf.readUInt16LE(eocd + 10);
+  let pos = buf.readUInt32LE(eocd + 16);
+  const parts = {};
+  for (let i = 0; i < count; i++) {
+    if (buf.readUInt32LE(pos) !== 0x02014b50) { throw new Error("битый каталог docx"); }
+    const method = buf.readUInt16LE(pos + 10);
+    const size = buf.readUInt32LE(pos + 20);
+    const nameLen = buf.readUInt16LE(pos + 28);
+    const extraLen = buf.readUInt16LE(pos + 30);
+    const commentLen = buf.readUInt16LE(pos + 32);
+    const offset = buf.readUInt32LE(pos + 42);
+    const entry = buf.slice(pos + 46, pos + 46 + nameLen).toString("utf8");
+    const dataStart = offset + 30 + buf.readUInt16LE(offset + 26) + buf.readUInt16LE(offset + 28);
+    const raw = buf.slice(dataStart, dataStart + size);
+    parts[entry] = method === 0 ? raw : zlib.inflateRawSync(raw);
+    pos += 46 + nameLen + extraLen + commentLen;
+  }
+  return parts;
+}
+
+function verify(buf) {
+  const parts = zipEntries(buf);
+  const xml = parts["word/document.xml"];
+  if (!xml) { throw new Error("в собранном файле нет word/document.xml"); }
+  const text = xml.toString("utf8").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  const problems = [];
+  for (const phrase of BANNED) {
+    if (text.includes(phrase)) { problems.push("в печати снова есть «" + phrase + "»"); }
+  }
+  for (const phrase of MIRRORED) {
+    if (!text.includes(phrase)) { problems.push("нет заголовка «" + phrase + "»"); }
+    if (!SITE_SOURCES.includes(phrase)) { problems.push("«" + phrase + "» нет на сайте — печать и сайт разошлись"); }
+  }
+  /* Фотографии: в документе должны лежать те же файлы, что на сайте, — именно
+   * на этом ловится подмена снимка (в печати когда-то стоял чужой храм). */
+  const media = Object.keys(parts)
+    .filter((name) => name.startsWith("word/media/") && /\.[a-z]+$/.test(name))
+    .map((name) => crypto.createHash("sha256").update(parts[name]).digest("hex"));
+  for (const church of stops) {
+    const wanted = crypto.createHash("sha256").update(fs.readFileSync(church.photo)).digest("hex");
+    if (media.indexOf(wanted) === -1) {
+      problems.push("фото " + church.photo + " в документе не совпадает с файлом сайта");
+    }
+  }
+  if (problems.length) {
+    throw new Error("печатная версия расходится с сайтом:\n  - " + problems.join("\n  - "));
+  }
+  return text.length;
+}
+
 Packer.toBuffer(buildDoc()).then((buf) => {
+  const chars = verify(buf);
   fs.writeFileSync("Дорогами-духовности-сайт.docx", buf);
   console.log("OK: Дорогами-духовности-сайт.docx,", buf.length, "bytes");
+  console.log("проверено: убранных блоков нет, " + MIRRORED.length + " заголовков совпадают с сайтом, " +
+    stops.length + " фотографии — те же файлы; знаков в тексте:", chars);
 });
