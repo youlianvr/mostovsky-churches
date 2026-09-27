@@ -22,7 +22,6 @@
  *   logistics    — километраж и способы добраться: fromGrodno/fromMosty
  *                  (расстояния — маршруты OpenStreetMap от центров городов,
  *                  время — оценка для авто)
- *   food         — ближайшие пункты питания
  * Плюс блок BUS — транспортные узлы (автостанция «Мосты», автовокзал Гродно):
  * адреса, касса, часы работы и источник рейсов, и BUS_STOPS — расписание
  * автобусов у остановок тройки (время, дни, путь от остановки до храма).
@@ -48,7 +47,6 @@ var CHURCHES = [
       fromGrodno: { road: "52,8 км", car: "≈50 минут" },
       fromMosty: { road: "29,9 км", car: "≈32 минуты" },
     },
-    food: "Пунктов питания в Гудевичи нет — воду и еду берите с собой. Ближайшие кафе и столовая — в Мостах.",
     photo: "img/photos/gudevichi-rozhdestva.jpg",
     photoSize: [1000, 750],
     photoCredit: "Автор: Сяргей Яраховіч (Валацуга), Wikimedia Commons, CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:%D0%93%D1%83%D0%B4%D0%B7%D0%B5%D0%B2%D1%96%D1%87%D1%8B._%D0%A1%D0%B2%D1%8F%D1%82%D0%B0-%D0%A0%D0%B0%D1%81%D1%82%D0%B2%D0%B0-%D0%91%D0%B0%D0%B3%D0%B0%D1%80%D0%BE%D0%B4%D0%B7%D1%96%D1%86%D0%BA%D0%B0%D1%8F_%D1%86%D0%B0%D1%80%D0%BA%D0%B2%D0%B0.jpg",
@@ -91,7 +89,6 @@ var CHURCHES = [
       fromGrodno: { road: "41,0 км", car: "≈40 минут" },
       fromMosty: { road: "25,9 км", car: "≈24 минуты" },
     },
-    food: "Пунктов питания в Лунно нет — воду и еду берите с собой. Ближайшие кафе и столовая — в Мостах.",
     photo: "img/photos/lunno-predtechi.jpg",
     photoSize: [800, 600],
     photoCredit: "Автор: В.Васіленка (fgb.by), Wikimedia Commons, CC BY-SA 3.0 — https://commons.wikimedia.org/wiki/File:%D0%9B%D1%83%D0%BD%D0%BD%D0%BE._%D0%A6%D0%B0%D1%80%D0%BA%D0%B2%D0%B0.jpg",
@@ -133,7 +130,6 @@ var CHURCHES = [
       fromGrodno: { road: "54,2 км", car: "≈49 минут" },
       fromMosty: { road: "14,5 км", car: "≈14 минут" },
     },
-    food: "Пунктов питания в Дубно нет — воду и еду берите с собой. Ближайшие кафе и столовая — в Мостах, по пути обратно.",
     photo: "img/photos/dubno-nikolaya.jpg",
     photoSize: [1280, 721],
     photoCredit: "Автор: desukov (Panoramio), Wikimedia Commons, CC BY 3.0 — https://commons.wikimedia.org/wiki/File:Дубна,_Belarus_-_panoramio.jpg",
@@ -200,17 +196,15 @@ var CONFESSIONS = {
   orthodox: "православный храм"
 };
 
-/* «Справочная информация»: ближайшие пункты питания на маршруте.
- * checked — место сверено по карте; у остальных в списке стоит пометка
- * «проверьте перед поездкой» вместо выдуманной точности. */
+/* «Справочная информация»: ближайшие пункты питания на маршруте. */
 var FOOD = {
   settlement: "г. Мосты",
   places: [
-    { name: "Столовая «Мостовдрев»", address: "г. Мосты, ул. Советская, 40", hours: "пн–пт 9:00–18:00", checked: true },
-    { name: "Пиццерия «Томат»", address: "г. Мосты, ул. Советская, 19", hours: "пн–чт 14:00–23:00, пт–вс 11:00–00:00", checked: true },
-    { name: "Кафе «Сабрина»", address: "г. Мосты, ул. Ленина", hours: "", checked: true },
-    { name: "Кафе «Неман»", address: "г. Мосты, пер. Пушкина, 2", hours: "", checked: false },
-    { name: "Закусочная «Тмин»", address: "г. Мосты, ул. Советская, 48", hours: "", checked: false }
+    { name: "Столовая «Мостовдрев»", address: "г. Мосты, ул. Советская, 40", hours: "пн–пт 9:00–18:00" },
+    { name: "Пиццерия «Томат»", address: "г. Мосты, ул. Советская, 19", hours: "пн–чт 14:00–23:00, пт–вс 11:00–00:00" },
+    { name: "Кафе «Сабрина»", address: "г. Мосты, ул. Ленина", hours: "" },
+    { name: "Кафе «Неман»", address: "г. Мосты, пер. Пушкина, 2", hours: "" },
+    { name: "Закусочная «Тмин»", address: "г. Мосты, ул. Советская, 48", hours: "" }
   ]
 };
 
@@ -295,7 +289,7 @@ var BUS_STOPS = [
 (function () {
   "use strict";
   var REQUIRED_TEXT = ["name", "shortName", "settlement", "built", "status", "address",
-    "services", "food", "photo", "photoCredit"];
+    "services", "photo", "photoCredit"];
   /* slug -> объект: и проверка дублей, и сверка routeStep идут по slug,
    * поэтому порядок объектов в CHURCHES ни на что не влияет. */
   var bySlug = {}, i, k;
@@ -392,16 +386,15 @@ var BUS_STOPS = [
     }
   }
 
-  /* Пункты питания: у каждого — имя, адрес и признак «проверено», чтобы
-   * непроверенное место было видно читателю, а не выдавалось за факт. */
+  /* Пункты питания: у каждого — имя и адрес. */
   if (!Array.isArray(FOOD.places) || !FOOD.places.length) {
     throw new Error("data.js: пустой список пунктов питания");
   }
   for (i = 0; i < FOOD.places.length; i++) {
     var place = FOOD.places[i];
     if (typeof place.name !== "string" || typeof place.address !== "string" ||
-        !place.name.trim() || !place.address.trim() || typeof place.checked !== "boolean") {
-      throw new Error("data.js: у пункта питания нет имени, адреса или пометки проверки — " + (place.name || i));
+        !place.name.trim() || !place.address.trim()) {
+      throw new Error("data.js: у пункта питания нет имени или адреса — " + (place.name || i));
     }
   }
   for (i = 0; i < ROUTE.length; i++) {

@@ -353,8 +353,7 @@ for (const c of stops) {
 children.push(h2("Питание"));
 for (const p of FOOD.places) {
   const tail = p.hours ? `, ${p.hours}` : "";
-  const mark = p.checked ? "" : " — проверьте перед поездкой";
-  children.push(bullet(p.name + " — " + p.address + tail + mark));
+  children.push(bullet(p.name + " — " + p.address + tail));
 }
 children.push(h2("Авторы проекта"));
 children.push(para([

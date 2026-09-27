@@ -193,8 +193,7 @@
     }).join("");
     var places = FOOD.places.map(function (place) {
       var tail = place.hours ? ", " + place.hours : "";
-      var mark = place.checked ? "" : '<span class="cell-note"> — проверьте перед поездкой</span>';
-      return "<li>" + H.escape(place.name) + " — " + H.escape(place.address) + H.escape(tail) + mark + "</li>";
+      return "<li>" + H.escape(place.name) + " — " + H.escape(place.address) + H.escape(tail) + "</li>";
     }).join("");
     H.paint('<h1>Справочная информация</h1>' +
       '<p class="page-lead">Контакты приходов, расписание богослужений и ближайшие пункты питания — всё, что нужно знать перед поездкой.</p>' +

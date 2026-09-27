@@ -29,7 +29,7 @@ node tests/content-completeness.js
 
 Checks every stop for identity, facts, at least two paragraphs of history, three or more
 facts, sources, distances from both
-Grodno and Mosty, parish contacts and service times, food note, photo attribution with a
+Grodno and Mosty, parish contacts and service times, photo attribution with a
 direct link, and the `visitPhotos` array for the personal photo report.
 
 ## Live browser smoke
