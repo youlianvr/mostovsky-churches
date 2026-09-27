@@ -18,8 +18,6 @@ CHURCHES.forEach(function (church) {
   check(Array.isArray(church.history) && church.history.length >= 2 && church.history.every(text), prefix + "history must contain at least two paragraphs");
   check(Array.isArray(church.facts) && church.facts.length >= 3 && church.facts.every(text), prefix + "facts list incomplete");
   check(Array.isArray(church.sources) && church.sources.length > 0 && church.sources.every(text), prefix + "sources incomplete");
-  /* «Описание» требует обоснование привлекательности по каждому объекту. */
-  check(text(church.appeal), prefix + "appeal (why visit) required");
   /* «Логистика»: расстояния от районного и областного центра. */
   check(church.logistics && church.logistics.fromGrodno && church.logistics.fromGrodno.road, prefix + "distance from Grodno required");
   check(church.logistics && church.logistics.fromMosty && church.logistics.fromMosty.road, prefix + "distance from Mosty required");

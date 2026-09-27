@@ -128,7 +128,8 @@ var markerPaint = schema.split('class="map-marker-g"').slice(1);
 check(markerPaint.length === 3 && markerPaint.every(function (marker) {
   return marker.indexOf("map-marker-icon") !== -1 && marker.indexOf("ci-cross") !== -1;
 }), "each marker must be the church icon, cross included");
-check(count(schema, "legend-icon") === 1, "legend must show the same church icon");
+check(count(schema, "legend-road") === 1 && count(schema, "legend-rail") === 1,
+  "legend must explain the roads and the railway");
 /* Нитка маршрута теперь по реальным дорогам: 4 перегона OSRM, и первый
  * перегон начинается в Гродно, а не в первой остановке. */
 check((schema.match(/map-route-line"/g) || []).length === 4,
@@ -140,12 +141,14 @@ check(schema.indexOf("cluster") === -1, "no clustering may remain in the schema"
 check((appEl.innerHTML + mapBox.innerHTML).indexOf("openstreetmap.org/copyright") !== -1,
   "the schema must attribute OpenStreetMap data (ODbL requirement)");
 
-/* --- description: historical note and the appeal of every object --- */
+/* --- description: historical note per object. Блоки «чем привлекателен»
+ * убраны решением владельца (2026-09-27) и не должны вернуться. --- */
 section("opis").render();
-check(count(appEl.innerHTML, 'class="stop-appeal"') === 3, "opis must state the appeal of each object");
+check(appEl.innerHTML.indexOf("stop-appeal") === -1, "opis must not carry the removed appeal blurb");
 check(appEl.innerHTML.indexOf("Привлекательность маршрута") !== -1, "opis must argue the route appeal");
 ROUTE.forEach(function (slug) {
-  check(appEl.innerHTML.indexOf(H.escape(find(slug).appeal)) !== -1, slug + ": appeal text must reach the page");
+  check(appEl.innerHTML.indexOf(H.escape(find(slug).history[0])) !== -1,
+    slug + ": the historical note must reach the page");
 });
 
 /* --- logistics: travel modes and distances from both centres --- */
@@ -184,8 +187,8 @@ BUS_STOPS.forEach(function (entry) {
 });
 check(appEl.innerHTML.indexOf("Автобусы у остановок маршрута") !== -1,
   "logistics must carry a bus timetable section");
-check(BUS.checked && appEl.innerHTML.indexOf(H.escape(BUS.checked)) !== -1,
-  "the bus data must state the date it was checked");
+check(appEl.innerHTML.indexOf(H.escape(BUS.source)) !== -1,
+  "the bus data must name the source of the timetable");
 
 /* --- reference: parish contacts and places to eat --- */
 section("spravka").render();
@@ -208,7 +211,8 @@ check(count(appEl.innerHTML, 'href="tel:') === ROUTE.filter(function (slug) { re
 check(appEl.innerHTML.indexOf("Питание") !== -1 && FOOD.places.every(function (place) {
   return appEl.innerHTML.indexOf(H.escape(place.name)) !== -1 && appEl.innerHTML.indexOf(H.escape(place.address)) !== -1;
 }), "reference must list real places to eat");
-check(count(appEl.innerHTML, 'class="source-check') >= 5, "reference must show at least five sources");
+check(appEl.innerHTML.indexOf("Авторы проекта") !== -1 && appEl.innerHTML.indexOf("Юлиан Ступчик") !== -1,
+  "the reference page must name the authors");
 
 /* --- photo report removed by owner decision (2026-09-26): no church page
  * may carry its slots or its label --- */
@@ -223,7 +227,7 @@ ROUTE.forEach(function (slug) {
   var church = find(slug);
   window.ChurchPage.render(church);
   check(appEl.innerHTML.indexOf("<h1>" + H.escape(church.name) + "</h1>") !== -1, slug + ": page must be titled by the object");
-  check(appEl.innerHTML.indexOf(H.escape(church.appeal)) !== -1, slug + ": page must state why to visit");
+  check(appEl.innerHTML.indexOf("church-lead") === -1, slug + ": the removed appeal line must not come back");
   check(count(appEl.innerHTML, 'class="locator-map"') === 1, slug + ": district locator required");
   check(count(appEl.innerHTML, "locator-icon") === 3, slug + ": locator must show all three stops");
   check(appEl.innerHTML.indexOf("Как добраться") === -1,

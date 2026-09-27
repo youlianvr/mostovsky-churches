@@ -19,12 +19,12 @@ vm.runInContext(
   fs.readFileSync("js/data.js", "utf8") +
   ";this.CHURCHES=CHURCHES;this.ROUTE=ROUTE;" +
   "this.ROUTE_APPEAL=ROUTE_APPEAL;this.TRANSPORT_MODES=TRANSPORT_MODES;" +
-  "this.BUS=BUS;this.BUS_STOPS=BUS_STOPS;this.FOOD=FOOD;this.SOURCES=SOURCES;",
+  "this.BUS=BUS;this.BUS_STOPS=BUS_STOPS;this.FOOD=FOOD;",
   sandbox
 );
 const {
   CHURCHES, ROUTE, ROUTE_APPEAL, TRANSPORT_MODES,
-  BUS, BUS_STOPS, FOOD, SOURCES,
+  BUS, BUS_STOPS, FOOD,
 } = sandbox;
 const bySlug = Object.fromEntries(CHURCHES.map((c) => [c.slug, c]));
 const stops = ROUTE.map((s) => bySlug[s]);
@@ -211,7 +211,7 @@ children.push(
     { alignment: AlignmentType.CENTER, spacing: { after: 480 } }),
   para([run("Руководитель проекта: ", { bold: true }), run("Величко Татьяна Фредьевна")],
     { alignment: AlignmentType.CENTER, spacing: { after: 60 } }),
-  para([run("Разработчик сайта: ", { bold: true }), run("Юлиана Ступчика")],
+  para([run("Разработчик сайта: ", { bold: true }), run("Юлиан Ступчик")],
     { alignment: AlignmentType.CENTER, spacing: { after: 480 } }),
   para([run("Интерактивная версия: ", { bold: true }),
     run("https://youlianvr.github.io/mostovsky-churches/", { color: "1F4E79", underline: {} })],
@@ -223,12 +223,6 @@ children.push(
 
 /* ================= 1. Нитка маршрута ================= */
 children.push(h1("1. Нитка маршрута"));
-children.push(para(run(
-  "Три сельские церкви XIX века в Мостовском районе Гродненской области: Гудевичи (1852), " +
-  "Лунно (1889) и Дубно (1844). Маршрут начинается в Гродно и идёт с запада на восток: " +
-  "от шатровой колокольни Гудевичей к «крепостному» храму Лунно и дальше к самому крупному " +
-  "храму тройки в Дубно, а заканчивается в Мостах — районном центре."
-)));
 children.push(h3("Остановки маршрута"));
 for (let i = 0; i < stops.length; i++) {
   const c = stops[i];
@@ -241,9 +235,6 @@ for (let i = 0; i < stops.length; i++) {
 
 /* ================= 2. Карта-схема ================= */
 children.push(h1("2. Карта-схема"));
-children.push(para(run(
-  "Схема маршрута на реальной географии: границы района, Нёман и дороги — данные OpenStreetMap."
-)));
 children.push(new Paragraph({
   alignment: AlignmentType.CENTER, spacing: { before: 120, after: 40 },
   children: [new ImageRun({
@@ -252,9 +243,8 @@ children.push(new Paragraph({
   })],
 }));
 children.push(para(run(
-  "Условные знаки: иконка церкви с номером шага — остановка маршрута; красный пунктир — " +
-  "нитка маршрута по дорогам; жёлтые линии — автодороги; штриховая чёрная — железная " +
-  "дорога; синяя линия — река Неман. Геометрия района, реки и дорог, автопуть маршрута — " +
+  "Условные знаки: жёлтые линии — автодороги; штриховая чёрная — железная дорога; " +
+  "синяя линия — река Неман. Геометрия района, реки и дорог, автопуть маршрута — " +
   "© OpenStreetMap contributors (ODbL 1.0), маршрут — OSRM.",
   { italics: true, size: 20 }),
   { alignment: AlignmentType.CENTER }));
@@ -279,7 +269,6 @@ for (const t of ROUTE_APPEAL) children.push(para(run(t)));
 children.push(h2("Остановки: историческая справка"));
 for (const c of stops) {
   children.push(h3(`${c.routeStep}. ${c.name} (${c.built})`));
-  children.push(para(run(c.appeal, { italics: true })));
   for (const p of c.history) children.push(para(run(p)));
   children.push(para(run("Ключевые факты:", { bold: true }), { spacing: { after: 40 } }));
   for (const f of c.facts) children.push(bullet(f));
@@ -288,8 +277,8 @@ for (const c of stops) {
 /* ================= 4. Логистика ================= */
 children.push(h1("4. Логистика маршрута"));
 children.push(para(run(
-  "Способы передвижения и расстояния до каждой остановки — от Гродно (областной центр) " +
-  "и от Мостов (районный центр)."
+  "Способы передвижения и расстояния до каждой остановки: Гродно (областной центр), " +
+  "Мосты (районный центр)."
 )));
 children.push(h3("Время"));
 children.push(table(
@@ -307,7 +296,7 @@ children.push(para(run(
   "(ул. Ожешко, 25) путь длиннее: до Гудевичей около 59 км.",
   { italics: true, size: 20 }),
   { spacing: { before: 100 } }));
-children.push(h3("Где начинается маршрут: автовокзал Гродно и автостанция «Мосты»"));
+children.push(h3("Начало маршрута: автовокзал Гродно, автостанция «Мосты»"));
 for (const key of ["grodno", "mosty"]) {
   const b = BUS[key];
   children.push(para([
@@ -316,7 +305,7 @@ for (const key of ["grodno", "mosty"]) {
   ]));
 }
 children.push(para(run(BUS.note)));
-children.push(para(run(`Проверено ${BUS.checked}. Источник: ${BUS.source}.`,
+children.push(para(run(`Источник: ${BUS.source}.`,
   { italics: true, size: 20 })));
 children.push(h3("Автобусы у остановок маршрута"));
 children.push(para(run(
@@ -362,33 +351,22 @@ for (const c of stops) {
   }
 }
 children.push(h2("Питание"));
-children.push(para(run(FOOD.note)));
 for (const p of FOOD.places) {
   const tail = p.hours ? `, ${p.hours}` : "";
-  const mark = p.checked
-    ? " — адрес и часы сверены с OpenStreetMap " + BUS.checked
-    : " — место указано по ранним записям, проверьте перед поездкой";
+  const mark = p.checked ? "" : " — проверьте перед поездкой";
   children.push(bullet(p.name + " — " + p.address + tail + mark));
 }
-children.push(para(run(FOOD.source, { italics: true, size: 20 })));
-children.push(h2("Список источников"));
-children.push(para(run(SOURCES.requiredNote +
-  ` Готово ${SOURCES.items.filter((i) => i.done).length} из ${SOURCES.items.length}.`)));
-for (const item of SOURCES.items) {
-  children.push(bullet((item.done ? "[выполнено] " : "[в работе] ") + item.text));
-}
-children.push(para(run(
-  "Незакрытые пункты завершает автор проекта: запись беседы собирается во время поездки.",
-  { italics: true, size: 20 })));
+children.push(h2("Авторы проекта"));
+children.push(para([
+  run("Руководитель проекта: ", { bold: true }), run("Величко Татьяна Фредьевна. "),
+  run("Разработчик сайта: ", { bold: true }), run("Юлиан Ступчик."),
+]));
 
 /* ================= 6. Страницы храмов ================= */
 children.push(h1("6. Страницы храмов"));
 for (const c of stops) {
   children.push(h3(`${c.routeStep}. ${c.name} — ${c.settlement}`));
   children.push(...photo(c.photo, c.photoSize[0], c.photoSize[1], c.photoCredit));
-  children.push(para([
-    run("Чем привлекателен: ", { bold: true }), run(c.appeal),
-  ]));
   for (const paragraph of c.history) children.push(para(run(paragraph)));
   children.push(para(run("Ключевые факты:", { bold: true }), { spacing: { after: 40 } }));
   for (const fact of c.facts) children.push(bullet(fact));
@@ -437,14 +415,18 @@ const BANNED = [
   "Почему этот маршрут", "Сколько ехать до каждого храма",
   "От Гродно (центр)", "От Мостов (центр)", "Остановка 1 из 3",
   "Настоятель: протоиерей Николай Гляд", "тремя группами",
+  /* Убрано владельцем 2026-09-27: чек-лист с собственными критериями,
+   * печать даты сверки с OpenStreetMap и неверное имя разработчика. */
+  "Список источников", "Критерии конкурса", "сверены с OpenStreetMap", "Юлиана",
 ];
 /* Заголовки, которые обязаны быть одинаковыми на сайте и в печати. */
 const MIRRORED = [
   "Дорогами духовности", "Нитка маршрута",
-  "Схема маршрута на реальной географии", "Привлекательность маршрута",
+  "Привлекательность маршрута",
   "Остановки: историческая справка", "Логистика маршрута", "Время",
   "Автобусы у остановок маршрута", "Способы передвижения",
   "Справочная информация", "Приходы и контакты", "Питание",
+  "Авторы проекта",
 ];
 const SITE_SOURCES = ["js/data.js", "js/sections.js", "js/church.js"]
   .map((file) => fs.readFileSync(file, "utf8")).join("\n");

@@ -46,9 +46,6 @@
 
   function legendHtml() {
     return '<div class="legend">' +
-      '<span class="legend-item">' + H.icon("legend-icon") +
-      '<span>остановка маршрута: иконка церкви с номером шага</span></span>' +
-      '<span class="legend-item"><span class="legend-route"></span><span>нитка маршрута по дорогам</span></span>' +
       '<span class="legend-item"><span class="legend-road"></span><span>автодороги</span></span>' +
       '<span class="legend-item"><span class="legend-rail"></span><span>железная дорога</span></span>' +
       '</div>';

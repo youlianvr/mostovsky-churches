@@ -99,8 +99,7 @@
       H.escape(church.name) + "</strong></p>" +
       '<article class="church-page"><header class="church-head">' +
       "<h1>" + H.escape(church.name) + "</h1>" +
-      '<p class="church-subtitle">' + H.icon() + " " + H.escape(church.settlement) + " · " + confession + "</p>" +
-      '<p class="church-lead">' + H.escape(church.appeal) + "</p></header>" +
+      '<p class="church-subtitle">' + H.icon() + " " + H.escape(church.settlement) + " · " + confession + "</p></header>" +
       '<div class="church-side">' + photoHtml(church) + locatorHtml(church) + factsHtml(church, confession) +
       mapButtonsHtml(church) + "</div>" +
       '<div class="church-body"><h2>История</h2>' + history +
