@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "dev": "node scripts/serve.js"
+  },
   "dependencies": {
     "docx": "^9.7.1",
     "jsqr": "^1.4.0",
