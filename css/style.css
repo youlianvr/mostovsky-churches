@@ -581,6 +581,17 @@ a:hover { color: var(--color-ochre-deep); }
   padding-top: var(--space-md);
 }
 
+/* Основной текст — выключка по ширине, как в печатной версии. hyphens: auto
+ * работает по <html lang="ru"> и убирает провалы между словами. Списки и
+ * подписи остаются слева: короткие строки выключать нечего. */
+.church-body p,
+.stop-card p,
+.card p,
+.page-lead {
+  text-align: justify;
+  hyphens: auto;
+}
+
 /* ---------- Общие детали отделов Блока 1 ---------- */
 .page-lead {
   max-width: 68ch;
